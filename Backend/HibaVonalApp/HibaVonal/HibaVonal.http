@@ -1,0 +1,6 @@
+@HibaVonal_HostAddress = http://localhost:5216
+
+GET {{HibaVonal_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
