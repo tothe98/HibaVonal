@@ -16,6 +16,6 @@ public class OrderItem
 
     public int EquipmentId { get; set; }
 
-    [Required, ForeignKey("EquipmentId")]
-    public Equipment Equipment { get; set; }
+    [ForeignKey("EquipmentId")]
+    public Equipment? Equipment { get; set; }
 }

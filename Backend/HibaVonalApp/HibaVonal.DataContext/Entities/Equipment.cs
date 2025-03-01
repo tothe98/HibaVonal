@@ -13,6 +13,6 @@ public class Equipment
 
     public int ErrorTypeId { get; set; }
 
-    [Required, ForeignKey("ErrorTypeId")]
-    public ErrorType ErrorType { get; set; }
+    [ForeignKey("ErrorTypeId")]
+    public ErrorType? ErrorType { get; set; }
 }

@@ -9,7 +9,5 @@ public class Role
 
     [Required]
     public string Name { get; set; }
-
-    [Required]
     public IList<User> Users { get; set; }
 }

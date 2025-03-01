@@ -13,9 +13,7 @@ public abstract class Room
 
     public int DormitoryId { get; set; }
 
-    [Required, ForeignKey("DormitoryId")]
-    public Dormitory Dormitory { get; set; }
-
-    [Required]
+    [ForeignKey("DormitoryId")]
+    public Dormitory? Dormitory { get; set; }
     public IList<Equipment> Equipments { get; set; }
 }

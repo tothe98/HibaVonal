@@ -1,3 +1,4 @@
+using Hibavonal.DataContext.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -26,10 +27,10 @@ public class User
     public Role Role { get; set; }
 
     // These should depend on whether it has "Resident" role or not
-    public int DormitoryId { get; set; }
+    /*public int DormitoryId { get; set; }
 
     [ForeignKey("DormitoryId")]
-    public Dormitory Dormitory { get; set; }
+    public Dormitory Dormitory { get; set; }*/
 
     public int RoomId { get; set; }
 

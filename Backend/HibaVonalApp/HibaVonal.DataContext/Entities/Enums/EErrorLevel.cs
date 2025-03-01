@@ -1,8 +1,8 @@
 public enum ErrorLevel
 {
-    Critical,
-    High,
+    Low,
     Medium,
-    Low
+    High,
+    Critical
 }
 

@@ -15,8 +15,6 @@ public class Order
 
     [Required]
     public OrderStatus Status { get; set; }
-
-    [Required]
     public IList<OrderItem> Items { get; set; }
 }
 
