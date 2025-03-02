@@ -9,32 +9,32 @@ namespace HibaVonal.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class DormitoryController : ControllerBase
+    public class EquipmentController : ControllerBase
     {
-        private readonly IDormitoryService _dormitoryService;
-        public DormitoryController(IDormitoryService dormitoryService)
+        private readonly IEquipmentService _equipmentService;
+        public EquipmentController(IEquipmentService equipmentService)
         {
-            _dormitoryService = dormitoryService;
+            _equipmentService = equipmentService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Dormitory>> List()
+        public async Task<IEnumerable<Equipment>> List()
         {
-            return await _dormitoryService.List();
+            return await _equipmentService.List();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Dormitory dormitory)
+        public async Task<IActionResult> Add([FromBody] Equipment equipment)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Add(dormitory);
+                await _equipmentService.Add(equipment);
                 response.StatusCode = 200;
-                response.Message = "Dormitory added successfully";
+                response.Message = "Equipment added successfully";
                 return Ok(response);
             }
-            catch (AddressWithIdNotExistsException ex)
+            catch (ErrorTypeWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -43,7 +43,7 @@ namespace HibaVonal.Controllers
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
-            }catch (DormitoryOnAddressAlreadyExistsException ex)
+            }catch (EquipmentAlreadyExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -56,16 +56,17 @@ namespace HibaVonal.Controllers
             return BadRequest(response);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Dormitory dormitory)
+        public async Task<IActionResult> Update(Equipment equipment)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Update(dormitory);
+                await _equipmentService.Update(equipment);
                 response.StatusCode = 200;
-                response.Message = "Dormitory updated successfully";
+                response.Message = "Equipment updated successfully";
                 return Ok(response);
-            }catch(AddressWithIdNotExistsException ex)
+            }
+            catch (ErrorTypeWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -75,12 +76,7 @@ namespace HibaVonal.Controllers
                 response.StatusCode = 202;
                 response.Message = ex.Message;
             }
-            catch (DormitoryWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (DormitoryOnAddressAlreadyExistsException ex)
+            catch (EquipmentWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -99,12 +95,12 @@ namespace HibaVonal.Controllers
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Delete(id);
+                await _equipmentService.Delete(id);
                 response.StatusCode = 200;
-                response.Message = "Dormitory deleted successfully";
+                response.Message = "Equipment deleted successfully";
                 return Ok(response);
             }
-            catch (DormitoryWithIdNotExistsException ex)
+            catch (EquipmentWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;

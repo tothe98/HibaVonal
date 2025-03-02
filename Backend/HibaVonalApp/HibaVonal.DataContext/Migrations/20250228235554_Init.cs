@@ -1,4 +1,6 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable

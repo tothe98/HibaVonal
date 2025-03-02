@@ -9,32 +9,32 @@ namespace HibaVonal.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class DormitoryController : ControllerBase
+    public class RoomController : ControllerBase
     {
-        private readonly IDormitoryService _dormitoryService;
-        public DormitoryController(IDormitoryService dormitoryService)
+        private readonly IRoomService _roomService;
+        public RoomController(IRoomService roomService)
         {
-            _dormitoryService = dormitoryService;
+            _roomService = roomService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Dormitory>> List()
+        public async Task<IEnumerable<Room>> List()
         {
-            return await _dormitoryService.List();
+            return await _roomService.List();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Dormitory dormitory)
+        public async Task<IActionResult> AddRoom([FromBody] Room room)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Add(dormitory);
+                await _roomService.Add(room);
                 response.StatusCode = 200;
-                response.Message = "Dormitory added successfully";
+                response.Message = "Room added successfully";
                 return Ok(response);
             }
-            catch (AddressWithIdNotExistsException ex)
+            catch (RoomWithNumberExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -43,7 +43,7 @@ namespace HibaVonal.Controllers
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
-            }catch (DormitoryOnAddressAlreadyExistsException ex)
+            }catch (DormitoryWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -56,16 +56,27 @@ namespace HibaVonal.Controllers
             return BadRequest(response);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Dormitory dormitory)
+        public async Task<IActionResult> Update(Room room)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Update(dormitory);
+                await _roomService.Update(room);
                 response.StatusCode = 200;
-                response.Message = "Dormitory updated successfully";
+                response.Message = "Room updated successfully";
                 return Ok(response);
-            }catch(AddressWithIdNotExistsException ex)
+            }
+            catch(RoomRoomTypeNotMatchException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch(RoomWithNumberExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch(DormitoryWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -75,12 +86,7 @@ namespace HibaVonal.Controllers
                 response.StatusCode = 202;
                 response.Message = ex.Message;
             }
-            catch (DormitoryWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (DormitoryOnAddressAlreadyExistsException ex)
+            catch (RoomWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -99,12 +105,12 @@ namespace HibaVonal.Controllers
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Delete(id);
+                await _roomService.Delete(id);
                 response.StatusCode = 200;
-                response.Message = "Dormitory deleted successfully";
+                response.Message = "Room deleted successfully";
                 return Ok(response);
             }
-            catch (DormitoryWithIdNotExistsException ex)
+            catch (RoomWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;

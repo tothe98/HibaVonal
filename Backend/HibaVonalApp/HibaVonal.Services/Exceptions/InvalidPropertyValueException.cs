@@ -2,7 +2,7 @@
 {
     public class InvalidPropertyValueException : Exception
     {
-        public InvalidPropertyValueException(string name, string type) : base($"A(z) {name} mező értéke nem felel meg a {type} típusnak!")
+        public InvalidPropertyValueException(string name, string type) : base($"The {name} field's value has to be {type} type!")
         {
 
         }

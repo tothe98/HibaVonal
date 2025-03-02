@@ -29,23 +29,33 @@ namespace HibaVonal.Services.Services
         {
             ObjectValidatorService<Dormitory> v = new ObjectValidatorService<Dormitory>(dormitory);
             v.IsValid();
-            if (!_context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
+            if (_context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
             {
-                await _context.Dormitory.AddAsync(dormitory);
-                await _context.SaveChangesAsync();
+                throw new DormitoryOnAddressAlreadyExistsException();
             }
-            else
+            if (!_context.Address.Any(a => a.Id == dormitory.AddressId))
             {
-                throw new DormitoryAlreadyExistsException();
+                throw new AddressWithIdNotExistsException();
             }
+            await _context.Dormitory.AddAsync(dormitory);
+            await _context.SaveChangesAsync();
         }
         public async Task Update(Dormitory dormitory)
         {
             ObjectValidatorService<Dormitory> v = new ObjectValidatorService<Dormitory>(dormitory);
             v.IsValid();
-            if (!_context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
+            Dormitory oldDormitory = _context.Dormitory.AsNoTracking().FirstOrDefault(d => d.Id == dormitory.Id);
+            if (oldDormitory == null)
             {
                 throw new DormitoryWithIdNotExistsException();
+            }
+            if (!_context.Address.Any(a => a.Id == dormitory.AddressId))
+            {
+                throw new AddressWithIdNotExistsException();
+            }
+            if (oldDormitory.AddressId!=dormitory.AddressId && _context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
+            {
+                throw new DormitoryOnAddressAlreadyExistsException();
             }
             _context.Dormitory.Update(dormitory);
             await _context.SaveChangesAsync();

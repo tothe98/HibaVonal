@@ -9,41 +9,42 @@ namespace HibaVonal.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class DormitoryController : ControllerBase
+    public class OrderItemController : ControllerBase
     {
-        private readonly IDormitoryService _dormitoryService;
-        public DormitoryController(IDormitoryService dormitoryService)
+        private readonly IOrderItemService _orderItemService;
+        public OrderItemController(IOrderItemService orderItemService)
         {
-            _dormitoryService = dormitoryService;
+            _orderItemService = orderItemService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Dormitory>> List()
+        public async Task<IEnumerable<OrderItem>> List()
         {
-            return await _dormitoryService.List();
+            return await _orderItemService.List();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Dormitory dormitory)
+        public async Task<IActionResult> Add([FromBody] OrderItem orderItem)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Add(dormitory);
+                await _orderItemService.Add(orderItem);
                 response.StatusCode = 200;
-                response.Message = "Dormitory added successfully";
+                response.Message = "OrderItem added successfully";
                 return Ok(response);
             }
-            catch (AddressWithIdNotExistsException ex)
+            catch(OrderWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (EquipmentWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
             }
             catch (MandatoryPropertyEmptyException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }catch (DormitoryOnAddressAlreadyExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -56,16 +57,22 @@ namespace HibaVonal.Controllers
             return BadRequest(response);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Dormitory dormitory)
+        public async Task<IActionResult> Update(OrderItem orderItem)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Update(dormitory);
+                await _orderItemService.Update(orderItem);
                 response.StatusCode = 200;
-                response.Message = "Dormitory updated successfully";
+                response.Message = "OrderItem updated successfully";
                 return Ok(response);
-            }catch(AddressWithIdNotExistsException ex)
+            }
+            catch (OrderWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (EquipmentWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -75,12 +82,7 @@ namespace HibaVonal.Controllers
                 response.StatusCode = 202;
                 response.Message = ex.Message;
             }
-            catch (DormitoryWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (DormitoryOnAddressAlreadyExistsException ex)
+            catch (OrderItemWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -88,7 +90,7 @@ namespace HibaVonal.Controllers
             catch (Exception ex)
             {
                 response.StatusCode = 202;
-                response.Message = ex.InnerException?.Message;
+                response.Message = ex.Message;
             }
             return BadRequest(response);
         }
@@ -99,12 +101,12 @@ namespace HibaVonal.Controllers
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Delete(id);
+                await _orderItemService.Delete(id);
                 response.StatusCode = 200;
-                response.Message = "Dormitory deleted successfully";
+                response.Message = "OrderItem deleted successfully";
                 return Ok(response);
             }
-            catch (DormitoryWithIdNotExistsException ex)
+            catch (OrderItemWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;

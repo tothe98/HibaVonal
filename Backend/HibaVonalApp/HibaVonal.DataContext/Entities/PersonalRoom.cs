@@ -7,5 +7,5 @@ public class PersonalRoom : Room
 {
     [Required]
     public int Number { get; set; }
-    public IList<User> Residents { get; set; }
+    public IList<User>? Residents { get; set; } = new List<User>();
 }

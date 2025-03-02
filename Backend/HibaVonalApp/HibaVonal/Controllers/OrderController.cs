@@ -9,41 +9,32 @@ namespace HibaVonal.Controllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
-    public class DormitoryController : ControllerBase
+    public class OrderController : ControllerBase
     {
-        private readonly IDormitoryService _dormitoryService;
-        public DormitoryController(IDormitoryService dormitoryService)
+        private readonly IOrderService _orderService;
+        public OrderController(IOrderService orderService)
         {
-            _dormitoryService = dormitoryService;
+            _orderService = orderService;
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Dormitory>> List()
+        public async Task<IEnumerable<Order>> List()
         {
-            return await _dormitoryService.List();
+            return await _orderService.List();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Dormitory dormitory)
+        public async Task<IActionResult> Add([FromBody] Order order)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Add(dormitory);
+                await _orderService.Add(order);
                 response.StatusCode = 200;
-                response.Message = "Dormitory added successfully";
+                response.Message = "Order added successfully";
                 return Ok(response);
             }
-            catch (AddressWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
             catch (MandatoryPropertyEmptyException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }catch (DormitoryOnAddressAlreadyExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -56,31 +47,22 @@ namespace HibaVonal.Controllers
             return BadRequest(response);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Dormitory dormitory)
+        public async Task<IActionResult> Update(Order order)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Update(dormitory);
+                await _orderService.Update(order);
                 response.StatusCode = 200;
-                response.Message = "Dormitory updated successfully";
+                response.Message = "Order updated successfully";
                 return Ok(response);
-            }catch(AddressWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
             }
             catch (MandatoryPropertyEmptyException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
             }
-            catch (DormitoryWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (DormitoryOnAddressAlreadyExistsException ex)
+            catch (OrderWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;
@@ -99,12 +81,12 @@ namespace HibaVonal.Controllers
             APIResponse response = new APIResponse();
             try
             {
-                await _dormitoryService.Delete(id);
+                await _orderService.Delete(id);
                 response.StatusCode = 200;
-                response.Message = "Dormitory deleted successfully";
+                response.Message = "Order deleted successfully";
                 return Ok(response);
             }
-            catch (DormitoryWithIdNotExistsException ex)
+            catch (OrderWithIdNotExistsException ex)
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;

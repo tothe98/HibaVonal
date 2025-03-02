@@ -4,6 +4,7 @@ using HibaVonal.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HibaVonal.DataContext.Migrations
 {
     [DbContext(typeof(SQL))]
-    partial class SQLModelSnapshot : ModelSnapshot
+    [Migration("20250301160954_AddOrderForeignKeyInOrderItem")]
+    partial class AddOrderForeignKeyInOrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -295,16 +298,16 @@ namespace HibaVonal.DataContext.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Discriminator")
+                        .IsRequired()
+                        .HasMaxLength(13)
+                        .HasColumnType("nvarchar(13)");
+
                     b.Property<int>("DormitoryId")
                         .HasColumnType("int");
 
                     b.Property<int>("Floor")
                         .HasColumnType("int");
-
-                    b.Property<string>("RoomType")
-                        .IsRequired()
-                        .HasMaxLength(13)
-                        .HasColumnType("nvarchar(13)");
 
                     b.HasKey("Id");
 
@@ -312,7 +315,7 @@ namespace HibaVonal.DataContext.Migrations
 
                     b.ToTable("Room");
 
-                    b.HasDiscriminator<string>("RoomType").HasValue("Room");
+                    b.HasDiscriminator().HasValue("Room");
 
                     b.UseTphMappingStrategy();
                 });

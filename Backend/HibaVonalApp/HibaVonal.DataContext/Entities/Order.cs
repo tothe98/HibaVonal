@@ -6,15 +6,13 @@ public class Order
 {
     [Key]
     public int Id { get; set; }
-
-    [Required]
-    public DateTime Date { get; set; }
+    public DateTime? Date { get; set; }=DateTime.Now;
 
     [Required]
     public int TotalAmount { get; set; }
 
     [Required]
     public OrderStatus Status { get; set; }
-    public IList<OrderItem> Items { get; set; }
+    public IList<OrderItem>? Items { get; set; } = new List<OrderItem>();
 }
 
