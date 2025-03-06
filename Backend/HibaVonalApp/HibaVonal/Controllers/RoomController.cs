@@ -34,6 +34,11 @@ namespace HibaVonal.Controllers
                 response.Message = "Room added successfully";
                 return Ok(response);
             }
+            catch (NotSupportedException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = "The given RoomType does not exist";
+            }
             catch (RoomWithNumberExistsException ex)
             {
                 response.StatusCode = 202;

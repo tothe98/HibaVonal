@@ -1,5 +1,6 @@
 ﻿using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,8 +10,8 @@ namespace HibaVonal.Services.Services
     public interface IAddressService
     {
         Task<IEnumerable<Address>> List();
-        Task Add(Address address);
-        Task Update(Address address);
+        Task Add(AddressDto address);
+        Task Update(int id, AddressDto address);
         Task Delete(int id);
     }
     public class AddressService : IAddressService
@@ -25,13 +26,19 @@ namespace HibaVonal.Services.Services
             return await _context.Address.ToListAsync();
         }
 
-        public async Task Add(Address address)
+        public async Task Add(AddressDto address)
         {
-            ObjectValidatorService<Address> v = new ObjectValidatorService<Address>(address);
+            ObjectValidatorService<AddressDto> v = new ObjectValidatorService<AddressDto>(address);
             v.IsValid();
-            if (!_context.Address.Any(d => d.Equals(address)))
+                Address add=new Address();
+                add.Street= address.Street;
+                add.City= address.City;
+                add.ZIP = address.ZIP;
+                add.HouseNumber=address.HouseNumber;
+
+            if (!_context.Address.Any(d => d.Equals(add)))
             {
-                await _context.Address.AddAsync(address);
+                await _context.Address.AddAsync(add);
                 await _context.SaveChangesAsync();
             }
             else
@@ -39,15 +46,22 @@ namespace HibaVonal.Services.Services
                 throw new AddressAlreadyExistsException();
             }
         }
-        public async Task Update(Address address)
+        public async Task Update(int id, AddressDto address)
         {
-            ObjectValidatorService<Address> v = new ObjectValidatorService<Address>(address);
+            ObjectValidatorService<AddressDto> v = new ObjectValidatorService<AddressDto>(address);
             v.IsValid();
-            if (!_context.Address.Any(a => a.Id == address.Id))
+            if (!_context.Address.Any(a => a.Id == id))
             {
                 throw new AddressWithIdNotExistsException();
             }
-            _context.Address.Update(address);
+
+            Address add=_context.Address.First(a => a.Id == id);
+            add.Street = address.Street;
+            add.City = address.City;
+            add.ZIP = address.ZIP;
+            add.HouseNumber = address.HouseNumber; 
+
+            _context.Address.Update(add);
             await _context.SaveChangesAsync();
         }
         

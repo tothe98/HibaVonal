@@ -10,5 +10,7 @@ public class Role
 
     [Required]
     public string Name { get; set; }
-    public IList<User>? Users { get; set; } = new List<User>();
+    public IList<User> Users { get; set; } = new List<User>();
+
+
 }

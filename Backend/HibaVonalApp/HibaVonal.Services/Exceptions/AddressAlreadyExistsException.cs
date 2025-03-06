@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace HibaVonal.Services.Services
+namespace HibaVonal.Services.Exceptions
 {
     public class AddressAlreadyExistsException : Exception
     {

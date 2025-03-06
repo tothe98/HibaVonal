@@ -4,6 +4,7 @@ using HibaVonal.DataContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HibaVonal.DataContext.Migrations
 {
     [DbContext(typeof(SQL))]
-    partial class SQLModelSnapshot : ModelSnapshot
+    [Migration("20250306095219_AddUserRole")]
+    partial class AddUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -69,9 +72,14 @@ namespace HibaVonal.DataContext.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("RoomId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("PersonalRoomId");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("User");
                 });
@@ -367,11 +375,17 @@ namespace HibaVonal.DataContext.Migrations
 
             modelBuilder.Entity("HibaVonal.DataContext.Entities.User", b =>
                 {
-                    b.HasOne("Hibavonal.DataContext.Entities.PersonalRoom", "PersonalRoom")
+                    b.HasOne("Hibavonal.DataContext.Entities.PersonalRoom", null)
                         .WithMany("Residents")
                         .HasForeignKey("PersonalRoomId");
 
-                    b.Navigation("PersonalRoom");
+                    b.HasOne("Hibavonal.DataContext.Entities.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Room");
                 });
 
             modelBuilder.Entity("HibaVonal.DataContext.Entities.UserRole", b =>

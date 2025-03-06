@@ -4,6 +4,7 @@ using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using HibaVonal.DataContext.Dtos;
 
 namespace HibaVonal.Controllers
 {
@@ -24,7 +25,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add([FromBody] Address address)
+        public async Task<IActionResult> Add([FromBody] AddressDto address)
         {
             APIResponse response = new APIResponse();
             try
@@ -47,12 +48,12 @@ namespace HibaVonal.Controllers
             return BadRequest(response);
         }
         [HttpPost]
-        public async Task<IActionResult> Update(Address address)
+        public async Task<IActionResult> Update(int id, [FromBody] AddressDto address)
         {
             APIResponse response = new APIResponse();
             try
             {
-                await _addressService.Update(address);
+                await _addressService.Update(id, address);
                 response.StatusCode = 200;
                 response.Message = "Address updated successfully";
                 return Ok(response);

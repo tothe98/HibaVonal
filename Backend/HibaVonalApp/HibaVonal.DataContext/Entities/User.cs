@@ -21,19 +21,18 @@ public class User
     [Required]
     public string Password { get; set; }
 
-    public int RoleId { get; set; }
-
-    [Required, ForeignKey("RoleId")]
-    public Role Role { get; set; }
-
     // These should depend on whether it has "Resident" role or not
     /*public int DormitoryId { get; set; }
 
     [ForeignKey("DormitoryId")]
     public Dormitory Dormitory { get; set; }*/
 
-    public int RoomId { get; set; }
+    public int? PersonalRoomId { get; set; }
 
-    [ForeignKey("RoomId")]
-    public Room Room { get; set; }
+    [ForeignKey("PersonalRoomId")]
+    public PersonalRoom? PersonalRoom { get; set; }
+    
+    public bool IsDeleted {  get; set; } = false;
+
+    public IList<Role> Roles { get; set; } = new List<Role>();
 }

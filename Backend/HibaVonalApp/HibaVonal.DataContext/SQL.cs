@@ -21,11 +21,14 @@ public class SQL : DbContext
     public DbSet<ErrorType> ErrorType { get; set; }
     public DbSet<Equipment> Equipment { get; set; }
     public DbSet<ErrorLog> ErrorLog { get; set; }
+    public DbSet<UserRole> UserRole { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Room>()
             .HasDiscriminator<string>("RoomType")
             .HasValue<PersonalRoom>("PersonalRoom")
             .HasValue<SharedRoom>("SharedRoom");
+
+        modelBuilder.Entity<UserRole>().HasKey("UserId", "RoleId");
     }
 }
