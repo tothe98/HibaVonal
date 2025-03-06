@@ -24,18 +24,15 @@ public class ErrorLog
     [Required]
     public ErrorLevel Level { get; set; }
 
-    public int RoomId { get; set; }
-
+    public int? RoomId { get; set; }
     [ForeignKey("RoomId")]
     public Room? Room { get; set; }
 
-    public int MaintenanceWorkerId { get; set; }
-
+    public int? MaintenanceWorkerId { get; set; }
     [ForeignKey("MaintenanceWorkerId")]
     public User? MaintenanceWorker { get; set; }
 
-    public int ReporterId { get; set; }
-
+    public int? ReporterId { get; set; }
     [ForeignKey("ReporterId")]
     public User? Reporter { get; set; }
 }

@@ -22,6 +22,7 @@ public class Dormitory
 
     [Required]
     public string PhoneNumber { get; set; }
+
     [Required]
     public int AddressId { get; set; }
     [ForeignKey("AddressId")]

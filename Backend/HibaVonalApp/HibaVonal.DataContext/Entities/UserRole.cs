@@ -1,23 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace HibaVonal.DataContext.Entities
+namespace HibaVonal.DataContext.Entities;
+
+public class UserRole
 {
-    public class UserRole
-    {
-        [ForeignKey("UserId")]
-        public int UserId { get; set; }
+    public int UserId { get; set; }
+    [ForeignKey("UserId")]
+    public User User { get; set; } = null!;
 
-        public User User { get; set; } = null!;
-        
-        [ForeignKey("RoleId")]
-        public int RoleId { get; set; }
-        public Role Role { get; set; } = null!;
-    }
+    public int RoleId { get; set; }
+    [ForeignKey("RoleId")]
+    public Role Role { get; set; } = null!;
 }

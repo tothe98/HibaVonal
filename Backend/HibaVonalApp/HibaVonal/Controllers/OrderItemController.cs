@@ -3,120 +3,119 @@ using HibaVonal.Services.Services;
 using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 
-namespace HibaVonal.Controllers
+namespace HibaVonal.Controllers;
+
+[ApiController]
+[Route("api/[controller]/[action]")]
+public class OrderItemController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]/[action]")]
-    public class OrderItemController : ControllerBase
+    private readonly IOrderItemService _orderItemService;
+    public OrderItemController(IOrderItemService orderItemService)
     {
-        private readonly IOrderItemService _orderItemService;
-        public OrderItemController(IOrderItemService orderItemService)
-        {
-            _orderItemService = orderItemService;
-        }
+        _orderItemService = orderItemService;
+    }
 
-        [HttpGet]
-        public async Task<IEnumerable<OrderItem>> List()
-        {
-            return await _orderItemService.List();
-        }
+    [HttpGet]
+    public async Task<IEnumerable<OrderItem>> List()
+    {
+        return await _orderItemService.List();
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> Add([FromBody] OrderItem orderItem)
+    [HttpPost]
+    public async Task<IActionResult> Create([FromBody] OrderItem orderItem)
+    {
+        APIResponse response = new APIResponse();
+        try
         {
-            APIResponse response = new APIResponse();
-            try
-            {
-                await _orderItemService.Add(orderItem);
-                response.StatusCode = 200;
-                response.Message = "OrderItem added successfully";
-                return Ok(response);
-            }
-            catch(OrderWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (EquipmentWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (MandatoryPropertyEmptyException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (Exception ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.InnerException?.Message;
-            }
-            return BadRequest(response);
+            await _orderItemService.Create(orderItem);
+            response.StatusCode = 200;
+            response.Message = "OrderItem added successfully";
+            return Ok(response);
         }
-        [HttpPost]
-        public async Task<IActionResult> Update(OrderItem orderItem)
+        catch (OrderWithIdNotExistsException ex)
         {
-            APIResponse response = new APIResponse();
-            try
-            {
-                await _orderItemService.Update(orderItem);
-                response.StatusCode = 200;
-                response.Message = "OrderItem updated successfully";
-                return Ok(response);
-            }
-            catch (OrderWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (EquipmentWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (MandatoryPropertyEmptyException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (OrderItemWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (Exception ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            return BadRequest(response);
+            response.StatusCode = 202;
+            response.Message = ex.Message;
         }
+        catch (EquipmentWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (MandatoryPropertyEmptyException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.InnerException?.Message;
+        }
+        return BadRequest(response);
+    }
 
-        [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+    [HttpPost]
+    public async Task<IActionResult> Update(OrderItem orderItem)
+    {
+        APIResponse response = new APIResponse();
+        try
         {
-            APIResponse response = new APIResponse();
-            try
-            {
-                await _orderItemService.Delete(id);
-                response.StatusCode = 200;
-                response.Message = "OrderItem deleted successfully";
-                return Ok(response);
-            }
-            catch (OrderItemWithIdNotExistsException ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.Message;
-            }
-            catch (Exception ex)
-            {
-                response.StatusCode = 202;
-                response.Message = ex.InnerException?.Message;
-            }
-            return BadRequest(response);
+            await _orderItemService.Update(orderItem);
+            response.StatusCode = 200;
+            response.Message = "OrderItem updated successfully";
+            return Ok(response);
         }
+        catch (OrderWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (EquipmentWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (MandatoryPropertyEmptyException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (OrderItemWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        return BadRequest(response);
+    }
+
+    [HttpDelete]
+    public async Task<IActionResult> Delete(int id)
+    {
+        APIResponse response = new APIResponse();
+        try
+        {
+            await _orderItemService.Delete(id);
+            response.StatusCode = 200;
+            response.Message = "OrderItem deleted successfully";
+            return Ok(response);
+        }
+        catch (OrderItemWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.InnerException?.Message;
+        }
+        return BadRequest(response);
     }
 }

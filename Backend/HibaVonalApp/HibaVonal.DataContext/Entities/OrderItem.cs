@@ -17,14 +17,11 @@ public class OrderItem
 
     [Required]
     public int EquipmentId { get; set; }
-
     [ForeignKey("EquipmentId")]
-    public Equipment? Equipment { get; set; }
+    public Equipment Equipment { get; set; }
 
     [Required]
     public int OrderId { get; set; }
-
-    [ForeignKey("OrderId")]
-    [JsonIgnore]
-    public Order? Order { get; set; }
+    [ForeignKey("OrderId"), JsonIgnore]
+    public Order Order { get; set; }
 }

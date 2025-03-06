@@ -28,10 +28,9 @@ public class User
     public Dormitory Dormitory { get; set; }*/
 
     public int? PersonalRoomId { get; set; }
-
     [ForeignKey("PersonalRoomId")]
     public PersonalRoom? PersonalRoom { get; set; }
-    
+
     public bool IsDeleted {  get; set; } = false;
 
     public IList<Role> Roles { get; set; } = new List<Role>();
