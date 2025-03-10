@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using HibaVonal.DataContext.Dtos;
 
-namespace HibaVonal.Services.Services
+namespace HibaVonal.Services.Security
 {
     public class TokenHandlerService
     {

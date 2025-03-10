@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace HibaVonal.Services.Services
+namespace HibaVonal.Services.Security
 {
     public class Encryption
     {
@@ -53,30 +53,30 @@ namespace HibaVonal.Services.Services
 
             private Salt(string hash)
             {
-                this._Salt = hash;
-                this._SaltArr = this._CreateSaltArr();
+                _Salt = hash;
+                _SaltArr = _CreateSaltArr();
             }
 
             public string GetString()
             {
-                return this._Salt;
+                return _Salt;
             }
 
             public override string ToString()
             {
-                return this.GetString();
+                return GetString();
             }
 
             private string[] _CreateSaltArr()
             {
                 int saltSplitLen = 4;
-                string[] saltArr = new string[this._Salt.Length / saltSplitLen];
+                string[] saltArr = new string[_Salt.Length / saltSplitLen];
                 int n = 0;
-                for (int i = 1; i <= this._Salt.Length; i++)
+                for (int i = 1; i <= _Salt.Length; i++)
                 {
                     if (i % saltSplitLen == 0)
                     {
-                        saltArr[n] = "$" + this._Salt.Substring(i - saltSplitLen, saltSplitLen) + "$";
+                        saltArr[n] = "$" + _Salt.Substring(i - saltSplitLen, saltSplitLen) + "$";
                         n++;
                     }
                 }
@@ -85,16 +85,16 @@ namespace HibaVonal.Services.Services
 
             public string MergeSaltWithHash(string hash)
             {
-                int saltArrLen = this._SaltArr.Length;
+                int saltArrLen = _SaltArr.Length;
                 Random rnd = new Random((int)DateTime.Now.Ticks);
                 int maxLenSplit = (int)Math.Floor((decimal)hash.Length / saltArrLen);
                 int[] positions = new int[saltArrLen];
                 positions[0] = 0;
-                hash = hash.Insert(positions[0], this._SaltArr[0]);
+                hash = hash.Insert(positions[0], _SaltArr[0]);
                 for (int i = 1; i < saltArrLen; i++)
                 {
-                    positions[i] = rnd.Next(positions[i - 1] + 1 + this._SaltArr[i].Length, hash.Length - maxLenSplit * (saltArrLen - i) - 1);
-                    hash = hash.Insert(positions[i], this._SaltArr[i]);
+                    positions[i] = rnd.Next(positions[i - 1] + 1 + _SaltArr[i].Length, hash.Length - maxLenSplit * (saltArrLen - i) - 1);
+                    hash = hash.Insert(positions[i], _SaltArr[i]);
                 }
                 return hash;
             }
@@ -172,8 +172,8 @@ namespace HibaVonal.Services.Services
             byte[] encryptedContent = new byte[secret.Length - iv.Length]; //the rest should be encryptedcontent
 
             //Copy data to byte array
-            System.Buffer.BlockCopy(secret, 0, iv, 0, iv.Length);
-            System.Buffer.BlockCopy(secret, iv.Length, encryptedContent, 0, encryptedContent.Length);
+            Buffer.BlockCopy(secret, 0, iv, 0, iv.Length);
+            Buffer.BlockCopy(secret, iv.Length, encryptedContent, 0, encryptedContent.Length);
 
             using (MemoryStream strm = new MemoryStream())
             {
@@ -216,8 +216,8 @@ namespace HibaVonal.Services.Services
         /// <returns>True if the given password is valid</returns>
         public bool Validate(string password)
         {
-            string hashed = this._GenerateHashString(password + this._Salt.GetString());
-            return hashed == this._PWHash;
+            string hashed = _GenerateHashString(password + _Salt.GetString());
+            return hashed == _PWHash;
         }
 
         /// <summary>
@@ -227,8 +227,8 @@ namespace HibaVonal.Services.Services
         /// <returns>Hashed password</returns>
         public string EncyptPassword(string password)
         {
-            string data = this._GenerateHashString(this._GenerateHash(password + this._Salt.GetString()));
-            return this._Salt.MergeSaltWithHash(data);
+            string data = _GenerateHashString(_GenerateHash(password + _Salt.GetString()));
+            return _Salt.MergeSaltWithHash(data);
         }
 
         #endregion Public methods
@@ -237,14 +237,14 @@ namespace HibaVonal.Services.Services
 
         private Encryption()
         {
-            this._TimeHash = this._GenerateHashString(this._StartTime.ToString());
-            this._Salt = Salt.CreateNew(this._TimeHash);
+            _TimeHash = _GenerateHashString(_StartTime.ToString());
+            _Salt = Salt.CreateNew(_TimeHash);
         }
 
         private Encryption(string hash)
         {
-            this._Salt = Salt.CreateFromHashedPassword(ref hash);
-            this._PWHash = hash;
+            _Salt = Salt.CreateFromHashedPassword(ref hash);
+            _PWHash = hash;
         }
 
         private byte[] _GenerateHash(string data)
@@ -255,7 +255,7 @@ namespace HibaVonal.Services.Services
 
         private string _GenerateHashString(string data)
         {
-            return this._GenerateHashString(this._GenerateHash(data));
+            return _GenerateHashString(_GenerateHash(data));
         }
 
         private string _GenerateHashString(byte[] data)

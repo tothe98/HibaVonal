@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Security.Claims;
 using Microsoft.OpenApi.Models;
+using HibaVonal.Services.Security;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -81,6 +82,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(JWTKey)
         };
     });
+
+/*
+ Elnevezés              ID
+
+ Admin                  1
+ MaintenanceManager     2
+ MaintenanceWorker      3
+ User                   4
+ */
+
 
 builder.Services.AddAuthorization(a =>
 {

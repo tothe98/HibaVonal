@@ -3,11 +3,8 @@ using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
 using HibaVonal.Services.Exceptions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using HibaVonal.Services.Security;
+using Microsoft.EntityFrameworkCore;
 
 namespace HibaVonal.Services.Services
 {
@@ -35,7 +32,13 @@ namespace HibaVonal.Services.Services
             v.IsValid();
             if (_context.User.Any(u => u.Email == loginData.Email))
             {
-                User user = _context.User.First(u => u.Email == loginData.Email);
+                User user = await _context.User.FirstAsync(u => u.Email == loginData.Email);
+
+                if(user.IsDeleted == true)
+                {
+                    throw new UnauthorizedAccessException();
+                }
+
                 Encryption enc = Encryption.Initialize(user.Password);
                 if (enc.Validate(loginData.Password))
                 {
@@ -90,6 +93,12 @@ namespace HibaVonal.Services.Services
                     
                     _context.User.Add(user);
                     await _context.SaveChangesAsync();
+                    //Ezt lehetne szebben is megoldani
+                    int userId = _context.User.First(u => u.Email == user.Email).Id;
+                    UserRole userRole = new UserRole() { RoleId = 4, UserId = userId };
+                    _context.UserRole.Add(userRole);
+                    await _context.SaveChangesAsync();
+                    
                     return new UserDataDto()
                     {
                         Email = user.Email,

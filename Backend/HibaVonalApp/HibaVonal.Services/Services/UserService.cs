@@ -1,11 +1,8 @@
 ﻿using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
+using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace HibaVonal.Services.Services
 {
@@ -13,8 +10,9 @@ namespace HibaVonal.Services.Services
     public interface IUserService
     {
         Task<IEnumerable<User>> List();
-        Task<User> Get(int id);
-        Task<User> Update(User user);
+        Task<User> GetById(int id);
+        Task<User> GetByEmail(string email);
+        Task<User> Update(UserUpdateDto user);
         Task Delete(int id);
     }
 
@@ -33,25 +31,60 @@ namespace HibaVonal.Services.Services
             return users;
         }
 
-        public async Task<User> Get(int id)
+        public async Task<User> GetById(int id)
         {
-            User user = await _context.User.FindAsync(id);
-            user.Password = null;
-            return user;
+            User user = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            if (user != null)
+            {
+                user.Password = null;
+                return user;
+            }
+            else
+            {
+                throw new NotFoundException("User is not found!");
+            }
         }
 
-        public async Task<User> Update(User user)
+        public async Task<User> GetByEmail(string email)
         {
-            //ellenőrzések 
-            _context.User.Update(user);
+            User user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+            if (user != null)
+            {
+                user.Password = null;
+                return user;
+
+            }
+            else
+            {
+                throw new NotFoundException("User is not found!");
+            }
+        }
+
+        public async Task<User> Update(UserUpdateDto user)
+        {
+            ObjectValidatorService<UserUpdateDto> objectValidatorService = new ObjectValidatorService<UserUpdateDto>(user);
+            objectValidatorService.IsValid();
+            User updatingUser = await _context.User.FirstOrDefaultAsync(u => u.Id == user.Id);
+            if (updatingUser == null)
+            {
+                throw new NotFoundException("User is not found!");
+            }
+            updatingUser.Name = user.Name;
+            updatingUser.Email = user.Email;
+            updatingUser.PhoneNumber = user.PhoneNumber;
+            updatingUser.PersonalRoomId = user.PersonalRoomId;
             await _context.SaveChangesAsync();
-            user.Password = null;
-            return user;
+            updatingUser.Password = null;
+            return updatingUser;
         }
 
         public async Task Delete(int id)
         {
-            User user = await _context.User.FindAsync(id);
+            User user = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            if (user == null)
+            {
+                throw new NotFoundException("User is not found!");
+            }
             user.IsDeleted = true;
             await _context.SaveChangesAsync();
         }
