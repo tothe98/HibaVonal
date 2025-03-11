@@ -2,8 +2,10 @@
 using HibaVonal.Services.Exceptions;
 using HibaVonal.Services.Services;
 using LibraryCommon.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using System.Net.Http.Headers;
 
 namespace HibaVonal.Controllers
 {
@@ -98,6 +100,38 @@ namespace HibaVonal.Controllers
                 return StatusCode(500, response);
             }
         }
+
+        [HttpGet]
+        [Authorize("User")]
+        public IActionResult ValidateToken([FromHeader] string authorization)
+        {
+
+            if (AuthenticationHeaderValue.TryParse(authorization, out var headerValue))
+            {
+
+                var scheme = headerValue.Scheme;
+                var parameter = headerValue.Parameter;
+
+                Console.WriteLine(parameter);
+
+                bool isValid = _authService.ValidatekToken(parameter);
+                if (isValid)
+                {
+                    return NoContent();
+                }
+                else
+                {
+                    return Unauthorized();
+                }
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
+
+        }
     }
+
 }
 

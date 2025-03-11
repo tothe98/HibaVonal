@@ -13,6 +13,7 @@ namespace HibaVonal.Services.Services
     {
         Task<AccessTokenDto> Login(LoginDto login);
         Task<UserDataDto> Registration(RegisterDto regiser);
+        bool ValidatekToken(string token);
 
     }
 
@@ -108,6 +109,11 @@ namespace HibaVonal.Services.Services
                 }
             }
 
+        }
+
+        public bool ValidatekToken(string token)
+        {
+            return _tokenHandler.ValidateToken(token);
         }
     }
 }
