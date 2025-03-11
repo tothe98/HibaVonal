@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 //én adtam hozzá eddig: builder.Services.AddControllers(); volt csak
-//Melyik megoldás? Az egyik megoldja az összes recursív lekérdezést, a másik, hogy az entityben [JsonIgnore] használata 
+//Melyik megoldás? Az egyik megoldja az összes recursív lekérdezést, a másik, hogy az entityben [JsonIgnore] használata
 
 /*builder.Services.AddControllers().AddJsonOptions(options =>
 {
@@ -113,7 +113,18 @@ builder.Services.AddAuthorization(a =>
     });
 });
 
-
+// Allow frontend
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:3000")
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
 
 var app = builder.Build();
 
@@ -124,6 +135,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "HibavonalApp API v1"));
 
 }
+
+app.UseCors("AllowFrontend");
 
 app.UseHttpsRedirection();
 
