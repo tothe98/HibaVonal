@@ -32,6 +32,7 @@ namespace HibaVonal.Services.Security
             var tokenHandler = new JwtSecurityTokenHandler();
             List<Claim> claims = new List<Claim>()
             {
+                new Claim("id",user.Id.ToString()),
                 new Claim(ClaimTypes.Email,user.Email),
                 new Claim(ClaimTypes.Name,user.Name)
             };
