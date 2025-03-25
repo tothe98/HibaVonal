@@ -1,5 +1,6 @@
 ﻿using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,8 +9,8 @@ namespace HibaVonal.Services.Services;
 public interface IDormitoryService
 {
     Task<IEnumerable<Dormitory>> List();
-    Task Create(Dormitory dormitory);
-    Task Update(Dormitory dormitory);
+    Task Create(DormitoryDto dormitory);
+    Task Update( int id ,DormitoryDto dormitory);
     Task Delete(int id);
 }
 
@@ -26,10 +27,20 @@ public class DormitoryService : IDormitoryService
         return await _context.Dormitory.Include(d => d.Address).ToListAsync();
     }
 
-    public async Task Create(Dormitory dormitory)
+    public async Task Create(DormitoryDto dormitory)
     {
-        ObjectValidatorService<Dormitory> v = new ObjectValidatorService<Dormitory>(dormitory);
+        ObjectValidatorService<DormitoryDto> v = new ObjectValidatorService<DormitoryDto>(dormitory);
         v.IsValid();
+        Dormitory dor= new Dormitory();
+        dor.Name = dormitory.Name;
+        dor.Manager = dormitory.Manager;
+        dor.ManagerContact = dormitory.ManagerContact;
+        dor.NumberOfFloors = dormitory.NumberOfFloors;
+        dor.PhoneNumber = dormitory.PhoneNumber;
+        dor.AddressId = dormitory.AddressId;
+        dor.Address= dormitory.Address;
+
+
         if (_context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
         {
             throw new DormitoryOnAddressAlreadyExistsException();
@@ -38,19 +49,20 @@ public class DormitoryService : IDormitoryService
         {
             throw new AddressWithIdNotExistsException();
         }
-        await _context.Dormitory.AddAsync(dormitory);
+        await _context.Dormitory.AddAsync(dor);
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(Dormitory dormitory)
+    public async Task Update(int id, DormitoryDto dormitory)
     {
-        ObjectValidatorService<Dormitory> v = new ObjectValidatorService<Dormitory>(dormitory);
+        ObjectValidatorService<DormitoryDto> v = new ObjectValidatorService<DormitoryDto>(dormitory);
         v.IsValid();
-        Dormitory oldDormitory = _context.Dormitory.AsNoTracking().FirstOrDefault(d => d.Id == dormitory.Id);
+        Dormitory oldDormitory = _context.Dormitory.AsNoTracking().FirstOrDefault(d => d.Id == id);
         if (oldDormitory == null)
         {
             throw new DormitoryWithIdNotExistsException();
         }
+        
         if (!_context.Address.Any(a => a.Id == dormitory.AddressId))
         {
             throw new AddressWithIdNotExistsException();
@@ -59,7 +71,15 @@ public class DormitoryService : IDormitoryService
         {
             throw new DormitoryOnAddressAlreadyExistsException();
         }
-        _context.Dormitory.Update(dormitory);
+        Dormitory updatedDormitory = _context.Dormitory.First(a => a.Id == id);
+        updatedDormitory.Name = dormitory.Name;
+        updatedDormitory.Manager = dormitory.Manager;
+        updatedDormitory.ManagerContact = dormitory.ManagerContact;
+        updatedDormitory.NumberOfFloors = dormitory.NumberOfFloors;
+        updatedDormitory.PhoneNumber = dormitory.PhoneNumber;
+        updatedDormitory.AddressId = dormitory.AddressId;
+        updatedDormitory.Address = dormitory.Address;
+        _context.Dormitory.Update(updatedDormitory);
         await _context.SaveChangesAsync();
     }
 

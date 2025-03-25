@@ -8,5 +8,5 @@ public class PersonalRoom : Room
     [Required]
     public int Number { get; set; }
 
-    public ICollection<User>? Residents { get; } = new List<User>();
+    public ICollection<User>? Residents { get; set; } = new List<User>();
 }

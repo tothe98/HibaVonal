@@ -2,14 +2,15 @@
 using HibaVonal.DataContext;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
+using HibaVonal.DataContext.Dtos;
 
 namespace HibaVonal.Services.Services;
 
 public interface IEquipmentService
 {
     Task<IEnumerable<Equipment>> List();
-    Task Create(Equipment equipment);
-    Task Update(Equipment equipment);
+    Task Create(EquipmentDto equipment);
+    Task Update(int id ,EquipmentDto equipment);
     Task Delete(int id);
 }
 public class EquipmentService : IEquipmentService
@@ -25,9 +26,9 @@ public class EquipmentService : IEquipmentService
         return await _context.Equipment.Include(e => e.ErrorType).ToListAsync();
     }
 
-    public async Task Create(Equipment equipment)
+    public async Task Create(EquipmentDto equipment)
     {
-        ObjectValidatorService<Equipment> v = new ObjectValidatorService<Equipment>(equipment);
+        ObjectValidatorService<EquipmentDto> v = new ObjectValidatorService<EquipmentDto>(equipment);
         v.IsValid();
         if (_context.Equipment.Any(e => e.Name == equipment.Name))
         {
@@ -37,15 +38,20 @@ public class EquipmentService : IEquipmentService
         {
             throw new ErrorTypeWithIdNotExistsException();
         }
-        await _context.Equipment.AddAsync(equipment);
+        Equipment newEquipment = new Equipment();
+        newEquipment.ErrorType = equipment.ErrorType;
+        newEquipment.ErrorTypeId = equipment.ErrorTypeId;
+        newEquipment.Name = equipment.Name;
+
+        await _context.Equipment.AddAsync(newEquipment);
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(Equipment equipment)
+    public async Task Update(int id ,EquipmentDto equipment)
     {
-        ObjectValidatorService<Equipment> v = new ObjectValidatorService<Equipment>(equipment);
+        ObjectValidatorService<EquipmentDto> v = new ObjectValidatorService<EquipmentDto>(equipment);
         v.IsValid();
-        if (!_context.Equipment.Any(e => e.Id == equipment.Id))
+        if (!_context.Equipment.Any(e => e.Id == id))
         {
             throw new EquipmentWithIdNotExistsException();
         }
@@ -53,7 +59,12 @@ public class EquipmentService : IEquipmentService
         {
             throw new ErrorTypeWithIdNotExistsException();
         }
-        _context.Equipment.Update(equipment);
+        Equipment newEquipment = _context.Equipment.FirstOrDefault(e => e.Id == id);
+        newEquipment.ErrorType = equipment.ErrorType;
+        newEquipment.ErrorTypeId = equipment.ErrorTypeId;
+        newEquipment.Name = equipment.Name;
+
+        _context.Equipment.Update(newEquipment);
         await _context.SaveChangesAsync();
     }
 

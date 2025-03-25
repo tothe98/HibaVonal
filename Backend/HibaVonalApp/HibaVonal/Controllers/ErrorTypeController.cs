@@ -3,6 +3,7 @@ using HibaVonal.Services.Exceptions;
 using HibaVonal.Services.Services;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
+using HibaVonal.DataContext.Dtos;
 
 namespace HibaVonal.Controllers;
 [ApiController]
@@ -22,7 +23,7 @@ public class ErrorTypeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ErrorType errorType)
+    public async Task<IActionResult> Create([FromBody] ErrorTypeDto errorType)
     {
         APIResponse response = new APIResponse();
         try
@@ -56,12 +57,12 @@ public class ErrorTypeController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(ErrorType errorType)
+    public async Task<IActionResult> Update(int id ,ErrorTypeDto errorType)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _errorTypeService.Update(errorType);
+            await _errorTypeService.Update(id , errorType);
             response.StatusCode = 200;
             response.Message = "ErrorType updated successfully";
             return Ok(response);

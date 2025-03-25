@@ -1,5 +1,6 @@
 ﻿using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,8 +9,8 @@ namespace HibaVonal.Services.Services;
 public interface IErrorTypeService
 {
     Task<IEnumerable<ErrorType>> List();
-    Task Create(ErrorType errorType);
-    Task Update(ErrorType errorType);
+    Task Create(ErrorTypeDto errorType);
+    Task Update(int id ,ErrorTypeDto errorType);
     Task Delete(int id);
 }
 public class ErrorTypeService : IErrorTypeService
@@ -25,13 +26,15 @@ public class ErrorTypeService : IErrorTypeService
         return await _context.ErrorType.ToListAsync();
     }
 
-    public async Task Create(ErrorType errorType)
+    public async Task Create(ErrorTypeDto errorType)
     {
-        ObjectValidatorService<ErrorType> v = new ObjectValidatorService<ErrorType>(errorType);
+        ObjectValidatorService<ErrorTypeDto> v = new ObjectValidatorService<ErrorTypeDto>(errorType);
         v.IsValid();
+        ErrorType newErrorType = new ErrorType();
+        newErrorType.Name = errorType.Name;
         if (!_context.ErrorType.Any(e => e.Name == errorType.Name))
         {
-            await _context.ErrorType.AddAsync(errorType);
+            await _context.ErrorType.AddAsync(newErrorType);
             await _context.SaveChangesAsync();
         }
         else
@@ -40,15 +43,17 @@ public class ErrorTypeService : IErrorTypeService
         }
     }
 
-    public async Task Update(ErrorType errorType)
+    public async Task Update(int id , ErrorTypeDto errorType)
     {
-        ObjectValidatorService<ErrorType> v = new ObjectValidatorService<ErrorType>(errorType);
+        ObjectValidatorService<ErrorTypeDto> v = new ObjectValidatorService<ErrorTypeDto>(errorType);
         v.IsValid();
-        if (!_context.ErrorType.Any(e => e.Id == errorType.Id))
+        if (!_context.ErrorType.Any(e => e.Id == id))
         {
             throw new DormitoryWithIdNotExistsException();
         }
-        _context.ErrorType.Update(errorType);
+        ErrorType newErrorType = _context.ErrorType.FirstOrDefault(e => e.Id == id);
+        newErrorType.Name = errorType.Name;
+        _context.ErrorType.Update(newErrorType);
         await _context.SaveChangesAsync();
     }
 

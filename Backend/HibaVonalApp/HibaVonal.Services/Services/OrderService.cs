@@ -1,5 +1,6 @@
 ﻿using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,8 +9,8 @@ namespace HibaVonal.Services.Services;
 public interface IOrderService
 {
     Task<IEnumerable<Order>> List();
-    Task Create(Order order);
-    Task Update(Order order);
+    Task Create(OrderDto order);
+    Task Update(int id , OrderDto order);
     Task Delete(int id);
 }
 
@@ -26,26 +27,35 @@ public class OrderService : IOrderService
         return await _context.Order.Include(d => d.Items).ToListAsync();
     }
 
-    public async Task Create(Order order)
+    public async Task Create(OrderDto order)
     {
-        ObjectValidatorService<Order> v = new ObjectValidatorService<Order>(order);
+        ObjectValidatorService<OrderDto> v = new ObjectValidatorService<OrderDto>(order);
         v.IsValid();
-        await _context.Order.AddAsync(order);
+        Order newOrder = new Order();
+        newOrder.Date = order.Date;
+        newOrder.TotalAmount = order.TotalAmount;
+        newOrder.Status= order.Status;
+        newOrder.Items = order.Items;
+        await _context.Order.AddAsync(newOrder);
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(Order order)
+    public async Task Update(int id, OrderDto order)
     {
-        ObjectValidatorService<Order> v = new ObjectValidatorService<Order>(order);
+        ObjectValidatorService<OrderDto> v = new ObjectValidatorService<OrderDto>(order);
         v.IsValid();
-        Order oldOrder = _context.Order.AsNoTracking().FirstOrDefault(o => o.Id == order.Id);
+        Order oldOrder = _context.Order.AsNoTracking().FirstOrDefault(o => o.Id == id);
         if (oldOrder == null)
         {
             throw new OrderWithIdNotExistsException();
         }
+        Order newOrder = _context.Order.First(o => o.Id == id);
         //Not updating the order date if an update happens
-        order.Date = oldOrder.Date;
-        _context.Order.Update(order);
+        newOrder.Date = oldOrder.Date;
+        newOrder.TotalAmount = order.TotalAmount;
+        newOrder.Status = order.Status;
+        newOrder.Items = order.Items;
+        _context.Order.Update(newOrder);
         await _context.SaveChangesAsync();
     }
 
