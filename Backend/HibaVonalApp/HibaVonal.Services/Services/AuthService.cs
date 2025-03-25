@@ -13,7 +13,7 @@ namespace HibaVonal.Services.Services
     {
         Task<AccessTokenDto> Login(LoginDto login);
         Task<UserDataDto> Registration(RegisterDto regiser);
-        bool ValidatekToken(string token);
+        bool ValidateToken(string token);
 
     }
 
@@ -91,7 +91,7 @@ namespace HibaVonal.Services.Services
                         Password = enc.EncyptPassword(regiser.Password),
                         PhoneNumber = regiser.PhoneNumber,
                     };
-                    
+
                     _context.User.Add(user);
                     await _context.SaveChangesAsync();
                     //Ezt lehetne szebben is megoldani
@@ -99,7 +99,7 @@ namespace HibaVonal.Services.Services
                     UserRole userRole = new UserRole() { RoleId = 4, UserId = userId };
                     _context.UserRole.Add(userRole);
                     await _context.SaveChangesAsync();
-                    
+
                     return new UserDataDto()
                     {
                         Email = user.Email,
@@ -111,7 +111,7 @@ namespace HibaVonal.Services.Services
 
         }
 
-        public bool ValidatekToken(string token)
+        public bool ValidateToken(string token)
         {
             return _tokenHandler.ValidateToken(token);
         }

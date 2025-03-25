@@ -114,7 +114,7 @@ namespace HibaVonal.Controllers
 
                 Console.WriteLine(parameter);
 
-                bool isValid = _authService.ValidatekToken(parameter);
+                bool isValid = _authService.ValidateToken(parameter);
                 if (isValid)
                 {
                     return NoContent();
