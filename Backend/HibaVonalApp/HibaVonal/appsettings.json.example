@@ -7,7 +7,7 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "SQL": "Server=database.tothe.hu;Database=HibaVonal;User Id=sa;Password=UqE10027;MultipleActiveResultSets=true;"
+    "SQL": ""
   },
   "JWT": {
     "Key": "key",
