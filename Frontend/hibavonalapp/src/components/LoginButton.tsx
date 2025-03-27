@@ -8,9 +8,9 @@ export default function LoginButton() {
             disabled={pending}
             type="submit"
             className={`
-                block min-w-0 grow py-2 px-5 rounded-md border-[2.5px] bg-cyan-400
-                border-cyan-400 hover:border-violet-500 focus:border-violet-500 hover:bg-violet-500
-                text-white placeholder:text-gray-500 focus:outline-none
+                py-3 px-6
+                rounded-md bg-cyan-400 font-bold hover:bg-cyan-500 text-white select-none
+                focus:outline-none focus:shadow-outline
             `}
             id="login-button-id"
         >

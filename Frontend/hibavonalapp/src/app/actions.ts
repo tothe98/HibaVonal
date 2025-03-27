@@ -1,11 +1,11 @@
 "use server"
 
-import { z } from "zod";
-import { createSession, deleteSession } from "@/lib/session";
-import { redirect } from "next/navigation";
+import { z } from "zod"
+import { createSession, deleteSession } from "@/lib/session"
+import { redirect } from "next/navigation"
 
 const loginSchema = z.object({
-    email: z.string().email({ message: "Invalid email address" }).trim(),
+    email: z.string().email({ message: "Invalid email or password" }).trim(),
     password: z.string().min(8, { message: "Password must be at least 8 characters" }).trim()
 })
 
@@ -27,7 +27,7 @@ export async function login(prevState: any, formData: FormData) {
         },
         body: JSON.stringify({ email, password }),
         credentials: "include",
-    });
+    })
 
     if (!response.ok) {
         return {
@@ -37,7 +37,7 @@ export async function login(prevState: any, formData: FormData) {
         }
     }
 
-    const data = await response.json();
+    const data = await response.json()
 
     await createSession(data?.data.token, data?.data.expiresAt)
 
