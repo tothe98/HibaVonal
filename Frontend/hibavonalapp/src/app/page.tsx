@@ -18,7 +18,7 @@ export default function loginPage() {
                     bg-white rounded-xl shadow-2xl shadow-gray-600
                 `}
             >
-                <h1 className="select-none sm:text-[2.5rem] text-4xl text-center font-bold mb-14">
+                <h1 className="select-none sm:text-[2.5rem] text-4xl text-center font-bold mb-12 pb-2">
                     Dorm Manager
                 </h1>
                 <div className="flex flex-col items-center mb-4">
@@ -42,7 +42,7 @@ export default function loginPage() {
 
                 <div className="mx-8 flex sm:flex-row flex-col-reverse items-center justify-between">
                     <LoginButton />
-                    <a className="select-none sm:mb-0 mb-4 inline-block align-baseline font-bold text-sm text-gray-500 hover:text-cyan-500" href="#">
+                    <a className="select-none sm:mb-0 mb-4 inline-block align-baseline font-bold text-sm text-gray-500 hover:text-cyan-500 duration-200" href="#">
                         Forgot Password?
                     </a>
                 </div>

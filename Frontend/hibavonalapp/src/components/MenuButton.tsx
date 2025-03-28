@@ -8,7 +8,7 @@ export default function MenuButton(props: Readonly<{ children: React.ReactNode }
             id={id ? `menu-button-${id}` : undefined}
             className={`
                 sm:block grow sm:px-8 sm:pb-6 sm:pt-10 p-4 px-6 justify-items-center flex items-center
-                rounded-md bg-white hover:bg-slate-100 text-black select-none shadow shadow-gray-300
+                rounded-md bg-white hover:bg-slate-100 text-black select-none shadow shadow-gray-300 duration-200
                 focus:outline-none focus:shadow-outline
             `}
             onClick={onClick}

@@ -9,7 +9,7 @@ export default function LoginButton() {
             type="submit"
             className={`
                 py-3 px-6
-                rounded-md bg-cyan-400 font-bold hover:bg-cyan-500 text-white select-none
+                rounded-md bg-cyan-400 font-bold hover:bg-cyan-500 text-white select-none duration-200
                 focus:outline-none focus:shadow-outline
             `}
             id="login-button-id"
