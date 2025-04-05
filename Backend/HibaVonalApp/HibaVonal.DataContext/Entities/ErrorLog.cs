@@ -19,10 +19,10 @@ public class ErrorLog
     public string Comment { get; set; }
 
     [Required]
-    public ErrorStatus Status { get; set; }
+    public EErrorStatus Status { get; set; }
 
     [Required]
-    public ErrorLevel Level { get; set; }
+    public EErrorLevel Level { get; set; }
 
     public int? RoomId { get; set; }
     [ForeignKey("RoomId")]

@@ -1,4 +1,4 @@
-public enum ErrorLevel
+public enum EErrorLevel
 {
     Low,
     Medium,

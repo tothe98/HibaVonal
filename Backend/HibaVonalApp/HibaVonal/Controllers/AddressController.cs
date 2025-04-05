@@ -1,5 +1,4 @@
-﻿using Hibavonal.DataContext.Entities;
-using HibaVonal.Services.Services;
+﻿using HibaVonal.Services.Services;
 using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -12,91 +11,143 @@ namespace HibaVonal.Controllers;
 public class AddressController : ControllerBase
 {
     private readonly IAddressService _addressService;
+
     public AddressController(IAddressService addressService)
     {
         _addressService = addressService;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Address>> List()
+    public async Task<ActionResult<List<AddressDto>>> List()
     {
-        return await _addressService.List();
+        try
+        {
+            List<AddressDto> result = await _addressService.List();
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred."
+            });
+        }
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] AddressDto address)
+    public async Task<ActionResult<APIResponse>> Create([FromBody] AddressCreateDto address)
     {
-        APIResponse response = new APIResponse();
         try
         {
-            await _addressService.Create(address);
-            response.StatusCode = 200;
-            response.Message = "Address added successfully";
-            return Ok(response);
+            AddressDto result = await _addressService.Create(address);
+            return Ok(new APIResponse
+            {
+                Data = result,
+                StatusCode = 200,
+                Message = "Address added successfully"
+            });
+        }
+        catch (AddressAlreadyExistsException ex)
+        {
+            return Conflict(new APIResponse
+            {
+                StatusCode = 409,
+                Message = ex.Message
+            });
         }
         catch (MandatoryPropertyEmptyException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return BadRequest(new APIResponse
+            {
+                StatusCode = 400,
+                Message = ex.Message
+            });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            response.StatusCode = 202;
-            response.Message = ex.InnerException?.Message;
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred"
+            });
         }
-        return BadRequest(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Update(int id, [FromBody] AddressDto address)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] AddressCreateDto address)
     {
-        APIResponse response = new APIResponse();
         try
         {
-            await _addressService.Update(id, address);
-            response.StatusCode = 200;
-            response.Message = "Address updated successfully";
-            return Ok(response);
+            AddressDto result = await _addressService.Update(id, address);
+            return Ok(new APIResponse
+            {
+                Data = result,
+                StatusCode = 200,
+                Message = "Address updated successfully"
+            });
         }
         catch (AddressWithIdNotExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return NotFound(new APIResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
+        }
+        catch (AddressAlreadyExistsException ex)
+        {
+            return Conflict(new APIResponse
+            {
+                StatusCode = 409,
+                Message = ex.Message
+            });
         }
         catch (MandatoryPropertyEmptyException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return BadRequest(new APIResponse
+            {
+                StatusCode = 400,
+                Message = ex.Message
+            });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred."
+            });
         }
-        return BadRequest(response);
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> Delete(int id)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<APIResponse>> Delete(int id)
     {
-        APIResponse response = new APIResponse();
         try
         {
             await _addressService.Delete(id);
-            response.StatusCode = 200;
-            response.Message = "Address deleted successfully";
-            return Ok(response);
+            return Ok(new APIResponse
+            {
+                StatusCode = 200,
+                Message = "Address deleted successfully"
+            });
         }
         catch (AddressWithIdNotExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return NotFound(new APIResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred."
+            });
         }
-        return BadRequest(response);
     }
 }

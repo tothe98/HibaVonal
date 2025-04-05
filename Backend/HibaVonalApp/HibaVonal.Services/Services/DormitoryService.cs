@@ -1,5 +1,7 @@
-﻿using Hibavonal.DataContext.Entities;
+﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,70 +9,80 @@ namespace HibaVonal.Services.Services;
 
 public interface IDormitoryService
 {
-    Task<IEnumerable<Dormitory>> List();
-    Task Create(Dormitory dormitory);
-    Task Update(Dormitory dormitory);
-    Task Delete(int id);
+    Task<List<DormitoryDto>> List();
+    Task<DormitoryDto> Create(DormitoryCreateDto dormitory);
+    Task<DormitoryDto> Update(int id, DormitoryCreateDto dormitory);
+    Task<bool> Delete(int id);
 }
 
 public class DormitoryService : IDormitoryService
 {
     private readonly SQL _context;
-    public DormitoryService(SQL context)
+    private readonly IMapper _mapper;
+
+    public DormitoryService(SQL context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Dormitory>> List()
+    public async Task<List<DormitoryDto>> List()
     {
-        return await _context.Dormitory.Include(d => d.Address).ToListAsync();
+        return await _context.Dormitory.Include(d => d.Address).Select(d => _mapper.Map<DormitoryDto>(d)).ToListAsync();
     }
 
-    public async Task Create(Dormitory dormitory)
+    public async Task<DormitoryDto> Create(DormitoryCreateDto dormitory)
     {
-        ObjectValidatorService<Dormitory> v = new ObjectValidatorService<Dormitory>(dormitory);
-        v.IsValid();
-        if (_context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
-        {
-            throw new DormitoryOnAddressAlreadyExistsException();
-        }
-        if (!_context.Address.Any(a => a.Id == dormitory.AddressId))
+        if (!await _context.Address.AnyAsync(a => a.Id == dormitory.AddressId))
         {
             throw new AddressWithIdNotExistsException();
         }
-        await _context.Dormitory.AddAsync(dormitory);
+        if (await _context.Dormitory.AnyAsync(d => d.AddressId == dormitory.AddressId))
+        {
+            throw new DormitoryOnAddressAlreadyExistsException();
+        }
+
+        Dormitory dorm = _mapper.Map<Dormitory>(dormitory);
+        await _context.Dormitory.AddAsync(dorm);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<DormitoryDto>(dorm);
     }
 
-    public async Task Update(Dormitory dormitory)
+    public async Task<DormitoryDto> Update(int id, DormitoryCreateDto dormitory)
     {
-        ObjectValidatorService<Dormitory> v = new ObjectValidatorService<Dormitory>(dormitory);
-        v.IsValid();
-        Dormitory oldDormitory = _context.Dormitory.AsNoTracking().FirstOrDefault(d => d.Id == dormitory.Id);
-        if (oldDormitory == null)
+        Dormitory dorm = await _context.Dormitory.FindAsync(id);
+        if (dorm == null)
         {
             throw new DormitoryWithIdNotExistsException();
         }
-        if (!_context.Address.Any(a => a.Id == dormitory.AddressId))
+        if (!await _context.Address.AnyAsync(a => a.Id == dormitory.AddressId))
         {
             throw new AddressWithIdNotExistsException();
         }
-        if (oldDormitory.AddressId != dormitory.AddressId && _context.Dormitory.Any(d => d.AddressId == dormitory.AddressId))
+        if (await _context.Dormitory.AnyAsync(d => d.AddressId == dormitory.AddressId && d.Id != id))
         {
             throw new DormitoryOnAddressAlreadyExistsException();
         }
-        _context.Dormitory.Update(dormitory);
+
+        _mapper.Map(dormitory, dorm);
+        _context.Dormitory.Update(dorm);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<DormitoryDto>(dorm);
     }
 
-    public async Task Delete(int id)
+    public async Task<bool> Delete(int id)
     {
-        var dormitory = _context.Dormitory.FirstOrDefault(d => d.Id == id);
+        Dormitory dormitory = await _context.Dormitory.FindAsync(id);
         if (dormitory == null)
         {
             throw new DormitoryWithIdNotExistsException();
         }
+
         _context.Dormitory.Remove(dormitory);
         await _context.SaveChangesAsync();
+
+        return true;
     }
 }

@@ -1,18 +1,25 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace HibaVonal.DataContext.Dtos;
+﻿namespace HibaVonal.DataContext.Dtos;
 
 public class AddressDto
 {
-    [Required]
+    public int Id { get; set; }
+
     public int ZIP { get; set; }
 
-    [Required]
     public string City { get; set; }
 
-    [Required]
     public string Street { get; set; }
 
-    [Required]
+    public int HouseNumber { get; set; }
+}
+
+public class AddressCreateDto
+{
+    public int ZIP { get; set; }
+
+    public string City { get; set; }
+
+    public string Street { get; set; }
+
     public int HouseNumber { get; set; }
 }

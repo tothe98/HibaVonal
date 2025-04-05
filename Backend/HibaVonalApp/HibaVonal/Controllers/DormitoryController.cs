@@ -1,4 +1,5 @@
 ﻿using Hibavonal.DataContext.Entities;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Services;
 using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
@@ -11,111 +12,158 @@ namespace HibaVonal.Controllers;
 public class DormitoryController : ControllerBase
 {
     private readonly IDormitoryService _dormitoryService;
+
     public DormitoryController(IDormitoryService dormitoryService)
     {
         _dormitoryService = dormitoryService;
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Dormitory>> List()
+    public async Task<ActionResult<List<DormitoryDto>>> List()
     {
-        return await _dormitoryService.List();
+        try
+        {
+            List<DormitoryDto> result = await _dormitoryService.List();
+            return Ok(result);
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred."
+            });
+        }
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Dormitory dormitory)
+    public async Task<ActionResult<APIResponse>> Create([FromBody] DormitoryCreateDto dormitory)
     {
-        APIResponse response = new APIResponse();
         try
         {
-            await _dormitoryService.Create(dormitory);
-            response.StatusCode = 200;
-            response.Message = "Dormitory added successfully";
-            return Ok(response);
+            DormitoryDto result = await _dormitoryService.Create(dormitory);
+            return Ok(new APIResponse
+            {
+                Data = result,
+                StatusCode = 200,
+                Message = "Dormitory added successfully"
+            });
         }
         catch (AddressWithIdNotExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return NotFound(new APIResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
         }
         catch (MandatoryPropertyEmptyException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return BadRequest(new APIResponse
+            {
+                StatusCode = 400,
+                Message = ex.Message
+            });
         }
         catch (DormitoryOnAddressAlreadyExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return Conflict(new APIResponse
+            {
+                StatusCode = 409,
+                Message = ex.Message
+            });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            response.StatusCode = 202;
-            response.Message = ex.InnerException?.Message;
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred"
+            });
         }
-        return BadRequest(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Update(Dormitory dormitory)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] DormitoryCreateDto dormitory)
     {
-        APIResponse response = new APIResponse();
         try
         {
-            await _dormitoryService.Update(dormitory);
-            response.StatusCode = 200;
-            response.Message = "Dormitory updated successfully";
-            return Ok(response);
+            await _dormitoryService.Update(id, dormitory);
+            return Ok(new APIResponse
+            {
+                StatusCode = 200,
+                Message = "Dormitory updated successfully"
+            });
         }
         catch (AddressWithIdNotExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return NotFound(new APIResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
         }
         catch (MandatoryPropertyEmptyException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return BadRequest(new APIResponse
+            {
+                StatusCode = 400,
+                Message = ex.Message
+            });
         }
         catch (DormitoryWithIdNotExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return NotFound(new APIResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
         }
         catch (DormitoryOnAddressAlreadyExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return Conflict(new APIResponse
+            {
+                StatusCode = 409,
+                Message = ex.Message
+            });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            response.StatusCode = 202;
-            response.Message = ex.InnerException?.Message;
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred."
+            });
         }
-        return BadRequest(response);
     }
 
-    [HttpDelete]
-    public async Task<IActionResult> Delete(int id)
+    [HttpDelete("{id}")]
+    public async Task<ActionResult<APIResponse>> Delete(int id)
     {
-        APIResponse response = new APIResponse();
         try
         {
             await _dormitoryService.Delete(id);
-            response.StatusCode = 200;
-            response.Message = "Dormitory deleted successfully";
-            return Ok(response);
+            return Ok(new APIResponse
+            {
+                StatusCode = 200,
+                Message = "Dormitory deleted successfully"
+            });
         }
         catch (DormitoryWithIdNotExistsException ex)
         {
-            response.StatusCode = 202;
-            response.Message = ex.Message;
+            return NotFound(new APIResponse
+            {
+                StatusCode = 404,
+                Message = ex.Message
+            });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            response.StatusCode = 202;
-            response.Message = ex.InnerException?.Message;
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred"
+            });
         }
-        return BadRequest(response);
     }
 }

@@ -1,4 +1,5 @@
-﻿using Hibavonal.DataContext.Entities;
+﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
@@ -8,73 +9,72 @@ namespace HibaVonal.Services.Services;
 
 public interface IAddressService
 {
-    Task<IEnumerable<Address>> List();
-    Task Create(AddressDto address);
-    Task Update(int id, AddressDto address);
-    Task Delete(int id);
+    Task<List<AddressDto>> List();
+    Task<AddressDto> Create(AddressCreateDto address);
+    Task<AddressDto> Update(int id, AddressCreateDto address);
+    Task<bool> Delete(int id);
 }
 
 public class AddressService : IAddressService
 {
     private readonly SQL _context;
-    public AddressService(SQL context)
+    private readonly IMapper _mapper;
+
+    public AddressService(SQL context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Address>> List()
+    public async Task<List<AddressDto>> List()
     {
-        return await _context.Address.ToListAsync();
+        return await _context.Address.Select(a => _mapper.Map<AddressDto>(a)).ToListAsync();
     }
 
-    public async Task Create(AddressDto address)
+    public async Task<AddressDto> Create(AddressCreateDto address)
     {
-        ObjectValidatorService<AddressDto> v = new ObjectValidatorService<AddressDto>(address);
-        v.IsValid();
-        Address add = new Address();
-        add.Street = address.Street;
-        add.City = address.City;
-        add.ZIP = address.ZIP;
-        add.HouseNumber = address.HouseNumber;
-
-        if (!_context.Address.Any(d => d.Equals(add)))
-        {
-            await _context.Address.AddAsync(add);
-            await _context.SaveChangesAsync();
-        }
-        else
+        if (await _context.Address.AnyAsync(a => a.ZIP == address.ZIP && a.HouseNumber == address.HouseNumber))
         {
             throw new AddressAlreadyExistsException();
         }
+
+        Address addr = _mapper.Map<Address>(address);
+        await _context.Address.AddAsync(addr);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<AddressDto>(addr);
     }
 
-    public async Task Update(int id, AddressDto address)
+    public async Task<AddressDto> Update(int id, AddressCreateDto address)
     {
-        ObjectValidatorService<AddressDto> v = new ObjectValidatorService<AddressDto>(address);
-        v.IsValid();
-        if (!_context.Address.Any(a => a.Id == id))
+        Address addr = await _context.Address.FindAsync(id);
+        if (addr == null)
+        {
+            throw new AddressWithIdNotExistsException();
+        }
+        if (await _context.Address.AnyAsync(a => a.Id != id && a.ZIP == address.ZIP && a.HouseNumber == address.HouseNumber))
+        {
+            throw new AddressAlreadyExistsException();
+        }
+
+        _mapper.Map(address, addr);
+        _context.Address.Update(addr);
+        await _context.SaveChangesAsync();
+
+        return _mapper.Map<AddressDto>(addr);
+    }
+
+    public async Task<bool> Delete(int id)
+    {
+        Address addr = await _context.Address.FindAsync(id);
+        if (addr == null)
         {
             throw new AddressWithIdNotExistsException();
         }
 
-        Address add = _context.Address.First(a => a.Id == id);
-        add.Street = address.Street;
-        add.City = address.City;
-        add.ZIP = address.ZIP;
-        add.HouseNumber = address.HouseNumber;
-
-        _context.Address.Update(add);
+        _context.Address.Remove(addr);
         await _context.SaveChangesAsync();
-    }
 
-    public async Task Delete(int id)
-    {
-        var address = _context.Address.FirstOrDefault(a => a.Id == id);
-        if (address == null)
-        {
-            throw new AddressWithIdNotExistsException();
-        }
-        _context.Address.Remove(address);
-        await _context.SaveChangesAsync();
+        return true;
     }
 }
