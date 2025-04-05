@@ -1,4 +1,4 @@
-﻿using HibaVonal.DataContext.Entities;
+using HibaVonal.DataContext.Entities;
 
 namespace HibaVonal.DataContext.Dtos;
 

@@ -33,5 +33,6 @@ public class User
 
     public bool IsDeleted {  get; set; } = false;
 
-    public IList<Role> Roles { get; set; } = new List<Role>();
+    [NotMapped]
+    public IEnumerable<UserRole> Roles { get; set; } = new List<UserRole>();
 }

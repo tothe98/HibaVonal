@@ -1,4 +1,4 @@
-﻿namespace HibaVonal.DataContext.Dtos;
+namespace HibaVonal.DataContext.Dtos;
 
 public class UserUpdateDto
 {

@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;

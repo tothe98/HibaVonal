@@ -3,6 +3,7 @@ using HibaVonal.Services.Services;
 using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
+using HibaVonal.DataContext.Dtos;
 
 namespace HibaVonal.Controllers;
 
@@ -23,7 +24,7 @@ public class RoomController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Room room)
+    public async Task<IActionResult> Create([FromBody] RoomDto room)
     {
         APIResponse response = new APIResponse();
         try
@@ -62,12 +63,12 @@ public class RoomController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> Update(Room room)
+    public async Task<IActionResult> Update(int id ,RoomDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.Update(room);
+            await _roomService.Update(id ,room);
             response.StatusCode = 200;
             response.Message = "Room updated successfully";
             return Ok(response);

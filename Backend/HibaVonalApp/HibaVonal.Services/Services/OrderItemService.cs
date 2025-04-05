@@ -1,5 +1,6 @@
 ﻿using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,8 +9,8 @@ namespace HibaVonal.Services.Services;
 public interface IOrderItemService
 {
     Task<IEnumerable<OrderItem>> List();
-    Task Create(OrderItem orderItem);
-    Task Update(OrderItem orderItem);
+    Task Create(OrderItemDto orderItem);
+    Task Update(int id, OrderItemDto orderItem);
     Task Delete(int id);
 }
 
@@ -26,9 +27,9 @@ public class OrderItemService : IOrderItemService
         return await _context.OrderItem.Include(o => o.Equipment).Include(o => o.Order).ToListAsync();
     }
 
-    public async Task Create(OrderItem orderItem)
+    public async Task Create(OrderItemDto orderItem)
     {
-        ObjectValidatorService<OrderItem> v = new ObjectValidatorService<OrderItem>(orderItem);
+        ObjectValidatorService<OrderItemDto> v = new ObjectValidatorService<OrderItemDto>(orderItem);
         v.IsValid();
         if (!_context.Equipment.Any(e => e.Id == orderItem.EquipmentId))
         {
@@ -38,15 +39,25 @@ public class OrderItemService : IOrderItemService
         {
             throw new OrderWithIdNotExistsException();
         }
-        await _context.OrderItem.AddAsync(orderItem);
+        OrderItem newOrderItem = new OrderItem();
+        newOrderItem.Quantity = orderItem.Quantity;
+        newOrderItem.Price = orderItem.Price;
+        newOrderItem.EquipmentId = orderItem.EquipmentId;
+        newOrderItem.Equipment = orderItem.Equipment;
+        newOrderItem.OrderId = orderItem.OrderId;
+        newOrderItem.Order= orderItem.Order;
+
+
+
+        await _context.OrderItem.AddAsync(newOrderItem);
         await _context.SaveChangesAsync();
     }
 
-    public async Task Update(OrderItem orderItem)
+    public async Task Update(int id , OrderItemDto orderItem)
     {
-        ObjectValidatorService<OrderItem> v = new ObjectValidatorService<OrderItem>(orderItem);
+        ObjectValidatorService<OrderItemDto> v = new ObjectValidatorService<OrderItemDto>(orderItem);
         v.IsValid();
-        if (!_context.OrderItem.Any(o => o.Id == orderItem.Id))
+        if (!_context.OrderItem.Any(o => o.Id == id))
         {
             throw new OrderItemWithIdNotExistsException();
         }
@@ -58,7 +69,14 @@ public class OrderItemService : IOrderItemService
         {
             throw new OrderWithIdNotExistsException();
         }
-        _context.OrderItem.Update(orderItem);
+        OrderItem newOrderItem = _context.OrderItem.First(o => o.Id == id);
+        newOrderItem.Quantity = orderItem.Quantity;
+        newOrderItem.Price = orderItem.Price;
+        newOrderItem.EquipmentId = orderItem.EquipmentId;
+        newOrderItem.Equipment = orderItem.Equipment;
+        newOrderItem.OrderId = orderItem.OrderId;
+        newOrderItem.Order = orderItem.Order;
+        _context.OrderItem.Update(newOrderItem);
         await _context.SaveChangesAsync();
     }
 
