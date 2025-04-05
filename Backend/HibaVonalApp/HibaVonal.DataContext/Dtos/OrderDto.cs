@@ -1,6 +1,8 @@
+using Hibavonal.DataContext.Entities;
+
 namespace HibaVonal.DataContext.Dtos;
 
-public class OrderDTO
+public class OrderDto
 {
     public int Id { get; set; }
 
@@ -11,5 +13,5 @@ public class OrderDTO
     public EOrderStatus Status { get; set; }
 
     // Instead of exposing full OrderItem entity, use a DTO
-    public List<OrderItemDto>? Items { get; set; }
+    public List<OrderItem>? Items { get; set; }
 }

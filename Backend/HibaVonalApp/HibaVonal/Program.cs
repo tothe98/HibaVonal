@@ -55,16 +55,19 @@ builder.Services.AddSwaggerGen(option =>
                 });
 });
 
+
+byte[] JWTKey = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
+string? Audience = builder.Configuration["JWT:Audience"];
+string? Issuer = builder.Configuration["JWT:Issuer"];
+builder.Services.AddScoped<TokenHandlerService>(sp => new TokenHandlerService(sp.GetRequiredService<SQL>(), JWTKey, Issuer, Audience));
+
+
 // Database Connection
 builder.Services.AddDbContext<SQL>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQL")));
 
 // Local services
 builder.Services.AddAutoMapper(typeof(AutoMapperProfile));
 builder.Services.AddDbContext<SQL>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQL")));
-byte[] JWTKey = Encoding.UTF8.GetBytes(builder.Configuration["JWT:Key"]);
-string? Audience = builder.Configuration["JWT:Audience"];
-string? Issuer = builder.Configuration["JWT:Issuer"];
-builder.Services.AddScoped<TokenHandlerService>(sp => new TokenHandlerService(sp.GetRequiredService<SQL>(), JWTKey, Issuer, Audience));
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IDormitoryService, DormitoryService>();
 builder.Services.AddScoped<IErrorTypeService, ErrorTypeService>();
