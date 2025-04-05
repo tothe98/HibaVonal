@@ -1,4 +1,5 @@
 ﻿using Hibavonal.DataContext.Entities;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using HibaVonal.Services.Services;
 using LibraryCommon.Models;
@@ -16,19 +17,20 @@ public class ErrorTypeController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<ErrorType>> List()
+    public async Task<ActionResult<List<ErrorTypeDto>>> List()
     {
         return await _errorTypeService.List();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] ErrorType errorType)
+    public async Task<IActionResult> Create([FromBody] ErrorTypeCreateUpdateDto errorType)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _errorTypeService.Create(errorType);
+            var result = await _errorTypeService.Create(errorType);
             response.StatusCode = 200;
+            response.Data = result;
             response.Message = "ErrorType added successfully";
             return Ok(response);
         }
@@ -55,14 +57,15 @@ public class ErrorTypeController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Update(ErrorType errorType)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> Update(int id, ErrorTypeCreateUpdateDto errorType)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _errorTypeService.Update(errorType);
+            var result = await _errorTypeService.Update(id, errorType);
             response.StatusCode = 200;
+            response.Data = result;
             response.Message = "ErrorType updated successfully";
             return Ok(response);
         }

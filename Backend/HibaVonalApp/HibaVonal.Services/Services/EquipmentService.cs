@@ -1,5 +1,7 @@
-﻿using Hibavonal.DataContext.Entities;
+﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,28 +9,28 @@ namespace HibaVonal.Services.Services;
 
 public interface IEquipmentService
 {
-    Task<IEnumerable<Equipment>> List();
-    Task Create(Equipment equipment);
-    Task Update(Equipment equipment);
+    Task<List<EquipmentDto>> List();
+    Task<EquipmentDto> Create(EquipmentCreateDto equipment);
+    Task<EquipmentDto> Update(int id, EquipmentUpdateDto equipment);
     Task Delete(int id);
 }
 public class EquipmentService : IEquipmentService
 {
     private readonly SQL _context;
-    public EquipmentService(SQL context)
+    private readonly IMapper _mapper;
+    public EquipmentService(SQL context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<Equipment>> List()
+    public async Task<List<EquipmentDto>> List()
     {
-        return await _context.Equipment.Include(e => e.ErrorType).ToListAsync();
+        return await _context.Equipment.Include(e => e.ErrorType).Select(eq => _mapper.Map<EquipmentDto>(eq)).ToListAsync();
     }
 
-    public async Task Create(Equipment equipment)
+    public async Task<EquipmentDto> Create(EquipmentCreateDto equipment)
     {
-        ObjectValidatorService<Equipment> v = new ObjectValidatorService<Equipment>(equipment);
-        v.IsValid();
         if (_context.Equipment.Any(e => e.Name == equipment.Name))
         {
             throw new EquipmentAlreadyExistsException();
@@ -37,15 +39,15 @@ public class EquipmentService : IEquipmentService
         {
             throw new ErrorTypeWithIdNotExistsException();
         }
-        await _context.Equipment.AddAsync(equipment);
+        var result = await _context.Equipment.AddAsync(_mapper.Map<Equipment>(equipment));
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<EquipmentDto>(await _context.Equipment.Include(e => e.ErrorType).FirstOrDefaultAsync(e => e.Id == result.Entity.Id));
     }
 
-    public async Task Update(Equipment equipment)
+    public async Task<EquipmentDto> Update(int id, EquipmentUpdateDto equipment)
     {
-        ObjectValidatorService<Equipment> v = new ObjectValidatorService<Equipment>(equipment);
-        v.IsValid();
-        if (!_context.Equipment.Any(e => e.Id == equipment.Id))
+        if (!_context.Equipment.Any(e => e.Id == id))
         {
             throw new EquipmentWithIdNotExistsException();
         }
@@ -53,8 +55,12 @@ public class EquipmentService : IEquipmentService
         {
             throw new ErrorTypeWithIdNotExistsException();
         }
-        _context.Equipment.Update(equipment);
+        var eq = _mapper.Map<Equipment>(equipment);
+        eq.Id = id;
+        _context.Equipment.Update(eq);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<EquipmentDto>(await _context.Equipment.Include(e => e.ErrorType).FirstOrDefaultAsync(e => e.Id == id));
     }
 
     public async Task Delete(int id)

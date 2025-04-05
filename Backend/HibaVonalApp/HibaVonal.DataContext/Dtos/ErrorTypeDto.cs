@@ -6,3 +6,8 @@ public class ErrorTypeDto
 
     public string Name { get; set; }
 }
+
+public class ErrorTypeCreateUpdateDto
+{
+    public string Name { get; set; }
+}

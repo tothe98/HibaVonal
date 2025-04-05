@@ -46,7 +46,7 @@ public class DormitoryService : IDormitoryService
         await _context.Dormitory.AddAsync(dorm);
         await _context.SaveChangesAsync();
 
-        return _mapper.Map<DormitoryDto>(dorm);
+        return _mapper.Map<DormitoryDto>(await _context.Dormitory.Include(d => d.Address).FirstOrDefaultAsync(d => d.Id == dorm.Id));
     }
 
     public async Task<DormitoryDto> Update(int id, DormitoryCreateDto dormitory)
@@ -69,7 +69,7 @@ public class DormitoryService : IDormitoryService
         _context.Dormitory.Update(dorm);
         await _context.SaveChangesAsync();
 
-        return _mapper.Map<DormitoryDto>(dorm);
+        return _mapper.Map<DormitoryDto>(await _context.Dormitory.Include(d => d.Address).FirstOrDefaultAsync(d => d.Id == id));
     }
 
     public async Task<bool> Delete(int id)

@@ -88,9 +88,10 @@ public class DormitoryController : ControllerBase
     {
         try
         {
-            await _dormitoryService.Update(id, dormitory);
+            var result = await _dormitoryService.Update(id, dormitory);
             return Ok(new APIResponse
             {
+                Data = result,
                 StatusCode = 200,
                 Message = "Dormitory updated successfully"
             });

@@ -3,6 +3,7 @@ using HibaVonal.Services.Services;
 using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
+using HibaVonal.DataContext.Dtos;
 
 namespace HibaVonal.Controllers;
 
@@ -17,19 +18,32 @@ public class EquipmentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Equipment>> List()
+    public async Task<ActionResult<List<EquipmentDto>>> List()
     {
-        return await _equipmentService.List();
+        try
+        {
+            return Ok(await _equipmentService.List());
+
+        }
+        catch (Exception)
+        {
+            return StatusCode(500, new APIResponse
+            {
+                StatusCode = 500,
+                Message = "An unexpected error occurred."
+            });
+        }
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] Equipment equipment)
+    public async Task<ActionResult<APIResponse>> Create([FromBody] EquipmentCreateDto equipment)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _equipmentService.Create(equipment);
+            var result = await _equipmentService.Create(equipment);
             response.StatusCode = 200;
+            response.Data = result;
             response.Message = "Equipment added successfully";
             return Ok(response);
         }
@@ -56,13 +70,14 @@ public class EquipmentController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Update(Equipment equipment)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] EquipmentUpdateDto equipment)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _equipmentService.Update(equipment);
+            var result = await _equipmentService.Update(id, equipment);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "Equipment updated successfully";
             return Ok(response);
@@ -90,7 +105,7 @@ public class EquipmentController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         APIResponse response = new APIResponse();

@@ -1,5 +1,7 @@
-﻿using Hibavonal.DataContext.Entities;
+﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,32 +9,33 @@ namespace HibaVonal.Services.Services;
 
 public interface IErrorTypeService
 {
-    Task<IEnumerable<ErrorType>> List();
-    Task Create(ErrorType errorType);
-    Task Update(ErrorType errorType);
+    Task<List<ErrorTypeDto>> List();
+    Task<ErrorTypeDto> Create(ErrorTypeCreateUpdateDto errorType);
+    Task<ErrorTypeDto> Update(int id, ErrorTypeCreateUpdateDto errorType);
     Task Delete(int id);
 }
 public class ErrorTypeService : IErrorTypeService
 {
     private readonly SQL _context;
-    public ErrorTypeService(SQL context)
+    private readonly IMapper _mapper;
+    public ErrorTypeService(SQL context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
-    public async Task<IEnumerable<ErrorType>> List()
+    public async Task<List<ErrorTypeDto>> List()
     {
-        return await _context.ErrorType.ToListAsync();
+        return await _context.ErrorType.Select(e => _mapper.Map<ErrorTypeDto>(e)).ToListAsync();
     }
 
-    public async Task Create(ErrorType errorType)
+    public async Task<ErrorTypeDto> Create(ErrorTypeCreateUpdateDto errorType)
     {
-        ObjectValidatorService<ErrorType> v = new ObjectValidatorService<ErrorType>(errorType);
-        v.IsValid();
         if (!_context.ErrorType.Any(e => e.Name == errorType.Name))
         {
-            await _context.ErrorType.AddAsync(errorType);
+            await _context.ErrorType.AddAsync(_mapper.Map<ErrorType>(errorType));
             await _context.SaveChangesAsync();
+            return _mapper.Map<ErrorTypeDto>(await _context.ErrorType.FirstOrDefaultAsync(e => e.Name == errorType.Name));
         }
         else
         {
@@ -40,16 +43,17 @@ public class ErrorTypeService : IErrorTypeService
         }
     }
 
-    public async Task Update(ErrorType errorType)
+    public async Task<ErrorTypeDto> Update(int id, ErrorTypeCreateUpdateDto errorType)
     {
-        ObjectValidatorService<ErrorType> v = new ObjectValidatorService<ErrorType>(errorType);
-        v.IsValid();
-        if (!_context.ErrorType.Any(e => e.Id == errorType.Id))
+        if (!_context.ErrorType.Any(e => e.Id == id))
         {
-            throw new DormitoryWithIdNotExistsException();
+            throw new ErrorTypeWithIdNotExistsException();
         }
-        _context.ErrorType.Update(errorType);
+        var errType = _mapper.Map<ErrorType>(errorType);
+        errType.Id = id;
+        _context.ErrorType.Update(errType);
         await _context.SaveChangesAsync();
+        return _mapper.Map<ErrorTypeDto>(await _context.ErrorType.FirstOrDefaultAsync(e => e.Id == id));
     }
 
     public async Task Delete(int id)

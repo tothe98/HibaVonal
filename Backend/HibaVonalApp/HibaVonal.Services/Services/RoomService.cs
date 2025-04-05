@@ -1,4 +1,5 @@
-﻿using Hibavonal.DataContext.Entities;
+﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
@@ -16,9 +17,11 @@ public interface IRoomService
 public class RoomService : IRoomService
 {
     private readonly SQL _context;
-    public RoomService(SQL context)
+    private readonly IMapper _mapper;
+    public RoomService(SQL context, IMapper mapper)
     {
         _context = context;
+        _mapper = mapper;
     }
 
     private static Room MapToRoomType(Room room)
