@@ -9,9 +9,9 @@ namespace HibaVonal.Services.Services;
 
 public interface IRoomService
 {
-    Task<IEnumerable<Room>> List();
+    Task<List<RoomDto>> List();
     Task Create(RoomDto room);
-    Task Update(int id , RoomDto room);
+    Task Update(int id, RoomDto room);
     Task Delete(int id);
 }
 
@@ -25,25 +25,42 @@ public class RoomService : IRoomService
         _mapper = mapper;
     }
 
-    private static Room MapToRoomType(Room room)
+    private Room MapToRoomType(RoomDto room)
     {
-        if (room is SharedRoom sharedRoom)
+        if (room is SharedRoomDto sharedRoom)
         {
-            return sharedRoom;
+            return _mapper.Map<SharedRoom>(sharedRoom);
         }
-        else if (room is PersonalRoom personalRoom)
+        else if (room is PersonalRoomDto personalRoom)
         {
-            return personalRoom;
+            return _mapper.Map<PersonalRoom>(personalRoom);
         }
 
         throw new IncorrectRoomTypeException();
     }
 
-    public async Task<IEnumerable<Room>> List()
+    public async Task<List<RoomDto>> List()
     {
+        List<RoomDto> roomDtos = new List<RoomDto>();
         var rooms = await _context.Room.Include(r => r.Dormitory).ToListAsync();
+        rooms.ForEach(room =>
+        {
+            if (room is PersonalRoom personalRoom)
+            {
+                var result = _mapper.Map<PersonalRoomDto>(personalRoom);
+                result.RoomType = "PersonalRoom";
+                roomDtos.Add(result);
 
-        return rooms.Select(room => MapToRoomType(room)).ToList();
+            }
+            else if (room is SharedRoom sharedRoom)
+            {
+                var result = _mapper.Map<SharedRoomDto>(sharedRoom);
+                result.RoomType = "SharedRoom";
+                roomDtos.Add(result);
+            }
+        });
+
+        return roomDtos;
     }
 
     public async Task Create(RoomDto room)
@@ -64,10 +81,10 @@ public class RoomService : IRoomService
             }
             PersonalRoom newPersonalRoom = new PersonalRoom();
             newPersonalRoom.Number = personalRoom.Number;
-            newPersonalRoom.Residents = personalRoom.Residents;
+           // newPersonalRoom.Residents = personalRoom.Residents;
             newPersonalRoom.Floor = personalRoom.Floor;
             newPersonalRoom.DormitoryId = personalRoom.DormitoryId;
-            newPersonalRoom.Dormitory= personalRoom.Dormitory;
+            newPersonalRoom.Dormitory = personalRoom.Dormitory;
             newPersonalRoom.Equipments = personalRoom.Equipments;
 
             await _context.Room.AddAsync(newPersonalRoom);
@@ -89,7 +106,7 @@ public class RoomService : IRoomService
         }
     }
 
-    public async Task Update( int id, RoomDto room)
+    public async Task Update(int id, RoomDto room)
     {
         //Itt valamiért nem jól ellenőrzi a required attribútumokat!!!!!!!!!!!!!!!!
         //És ha nem adod meg egyáltalán az adott attribútumot, akkor is az a default érték lesz
@@ -119,12 +136,12 @@ public class RoomService : IRoomService
             {
                 throw new RoomWithNumberExistsException();
             }
-            PersonalRoom newPersonalRoom = _context.PersonalRoom.First(r => r.Id==id);
+            PersonalRoom newPersonalRoom = _context.PersonalRoom.First(r => r.Id == id);
             newPersonalRoom.Number = personalRoom.Number;
-            newPersonalRoom.Residents = personalRoom.Residents;
+            //newPersonalRoom.Residents = personalRoom.Residents;
             newPersonalRoom.Floor = personalRoom.Floor;
             newPersonalRoom.DormitoryId = personalRoom.DormitoryId;
-            newPersonalRoom.Dormitory= personalRoom.Dormitory;
+            newPersonalRoom.Dormitory = personalRoom.Dormitory;
             newPersonalRoom.Equipments = personalRoom.Equipments;
             _context.Room.Update(newPersonalRoom);
             await _context.SaveChangesAsync();
@@ -133,7 +150,7 @@ public class RoomService : IRoomService
         {
             ObjectValidatorService<SharedRoomDto> sr = new ObjectValidatorService<SharedRoomDto>(sharedRoom);
             sr.IsValid();
-            SharedRoom newSharedRoom = _context.SharedRoom.First(r=>r.Id == id);
+            SharedRoom newSharedRoom = _context.SharedRoom.First(r => r.Id == id);
             newSharedRoom.Floor = sharedRoom.Floor;
             newSharedRoom.DormitoryId = sharedRoom.DormitoryId;
             newSharedRoom.Dormitory = sharedRoom.Dormitory;

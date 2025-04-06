@@ -18,9 +18,9 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Room>> List()
+    public async Task<ActionResult<List<RoomDto>>> List()
     {
-        return await _roomService.List();
+        return Ok(await _roomService.List());
     }
 
     [HttpPost]
