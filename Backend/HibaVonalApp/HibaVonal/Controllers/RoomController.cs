@@ -18,20 +18,58 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<RoomDto>>> List()
+    public async Task<ActionResult<IEnumerable<RoomDto>>> List()
     {
         return Ok(await _roomService.List());
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] RoomDto room)
+    public async Task<IActionResult> CreatePersonalRoom([FromBody] PersonalRoomCreateDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.Create(room);
+            await _roomService.CreatePersonalRoom(room);
             response.StatusCode = 200;
-            response.Message = "Room added successfully";
+            response.Message = "PersonalRoom added successfully";
+            return Ok(response);
+        }
+        catch (NotSupportedException)
+        {
+            response.StatusCode = 202;
+            response.Message = "The given RoomType does not exist";
+        }
+        catch (RoomWithNumberExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (MandatoryPropertyEmptyException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (DormitoryWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.InnerException?.Message;
+        }
+        return BadRequest(response);
+    }
+    [HttpPost]
+    public async Task<IActionResult> CreateSharedRoom([FromBody] SharedRoomCreateDto room)
+    {
+        APIResponse response = new APIResponse();
+        try
+        {
+            await _roomService.CreateSharedRoom(room);
+            response.StatusCode = 200;
+            response.Message = "SharedRoom added successfully";
             return Ok(response);
         }
         catch (NotSupportedException)
@@ -62,15 +100,59 @@ public class RoomController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Update(int id ,RoomDto room)
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdatePersonalRoom(int id ,PersonalRoomCreateDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.Update(id ,room);
+            await _roomService.UpdatePersonalRoom(id , room);
             response.StatusCode = 200;
-            response.Message = "Room updated successfully";
+            response.Message = "PersonalRoom updated successfully";
+            return Ok(response);
+        }
+        catch (RoomRoomTypeNotMatchException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (RoomWithNumberExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (DormitoryWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (MandatoryPropertyEmptyException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (RoomWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.InnerException?.Message;
+        }
+        return BadRequest(response);
+    }
+
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateSharedRoom(int id, SharedRoomCreateDto room)
+    {
+        APIResponse response = new APIResponse();
+        try
+        {
+            await _roomService.UpdateSharedRoom(id, room);
+            response.StatusCode = 200;
+            response.Message = "SharedRoom updated successfully";
             return Ok(response);
         }
         catch (RoomRoomTypeNotMatchException ex)

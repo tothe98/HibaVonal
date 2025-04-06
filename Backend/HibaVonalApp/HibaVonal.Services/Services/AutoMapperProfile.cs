@@ -30,6 +30,10 @@ public class AutoMapperProfile : Profile
         CreateMap<OrderItemCreateDto, OrderItem>();
 
         CreateMap<Room, RoomDto>().ReverseMap();
+        CreateMap<PersonalRoomDto, PersonalRoom>().ReverseMap();
+        CreateMap<SharedRoomDto, SharedRoom>().ReverseMap();
+        CreateMap<PersonalRoom, PersonalRoomCreateDto>().ReverseMap();
+        CreateMap<SharedRoom, SharedRoomCreateDto>().ReverseMap();
 
 
         CreateMap<ErrorLog, ErrorLogDto>().ReverseMap();

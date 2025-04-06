@@ -9,9 +9,11 @@ namespace HibaVonal.Services.Services;
 
 public interface IRoomService
 {
-    Task<List<RoomDto>> List();
-    Task Create(RoomDto room);
-    Task Update(int id, RoomDto room);
+    Task<IEnumerable<RoomDto>> List();
+    Task CreatePersonalRoom(PersonalRoomCreateDto room);
+    Task CreateSharedRoom(SharedRoomCreateDto room);
+    Task UpdatePersonalRoom(int id, PersonalRoomCreateDto room);
+    Task UpdateSharedRoom(int id, SharedRoomCreateDto room);
     Task Delete(int id);
 }
 
@@ -25,21 +27,7 @@ public class RoomService : IRoomService
         _mapper = mapper;
     }
 
-    private Room MapToRoomType(RoomDto room)
-    {
-        if (room is SharedRoomDto sharedRoom)
-        {
-            return _mapper.Map<SharedRoom>(sharedRoom);
-        }
-        else if (room is PersonalRoomDto personalRoom)
-        {
-            return _mapper.Map<PersonalRoom>(personalRoom);
-        }
-
-        throw new IncorrectRoomTypeException();
-    }
-
-    public async Task<List<RoomDto>> List()
+    public async Task<IEnumerable<RoomDto>> List()
     {
         List<RoomDto> roomDtos = new List<RoomDto>();
         var rooms = await _context.Room.Include(r => r.Dormitory).ToListAsync();
@@ -47,119 +35,79 @@ public class RoomService : IRoomService
         {
             if (room is PersonalRoom personalRoom)
             {
-                var result = _mapper.Map<PersonalRoomDto>(personalRoom);
+                var result = _mapper.Map<PersonalRoomDto>((PersonalRoom)personalRoom);
                 result.RoomType = "PersonalRoom";
                 roomDtos.Add(result);
 
             }
             else if (room is SharedRoom sharedRoom)
             {
-                var result = _mapper.Map<SharedRoomDto>(sharedRoom);
+                var result = _mapper.Map<SharedRoomDto>((SharedRoom)sharedRoom);
                 result.RoomType = "SharedRoom";
                 roomDtos.Add(result);
             }
         });
-
-        return roomDtos;
+        IEnumerable<RoomDto> res = roomDtos;
+        return res;
     }
 
-    public async Task Create(RoomDto room)
+    public async Task CreatePersonalRoom(PersonalRoomCreateDto room)
     {
-        ObjectValidatorService<RoomDto> v = new ObjectValidatorService<RoomDto>(room);
-        v.IsValid();
         if (!_context.Dormitory.Any(d => d.Id == room.DormitoryId))
         {
             throw new DormitoryWithIdNotExistsException();
         }
-        if (room is PersonalRoomDto personalRoom)
+        if (_context.Room.OfType<PersonalRoom>().Any(pr => pr.Number == room.Number))
         {
-            ObjectValidatorService<PersonalRoomDto> pr = new ObjectValidatorService<PersonalRoomDto>(personalRoom);
-            pr.IsValid();
-            if (_context.Room.OfType<PersonalRoom>().Any(pr => pr.Number == personalRoom.Number))
-            {
-                throw new RoomWithNumberExistsException();
-            }
-            PersonalRoom newPersonalRoom = new PersonalRoom();
-            newPersonalRoom.Number = personalRoom.Number;
-           // newPersonalRoom.Residents = personalRoom.Residents;
-            newPersonalRoom.Floor = personalRoom.Floor;
-            newPersonalRoom.DormitoryId = personalRoom.DormitoryId;
-            newPersonalRoom.Dormitory = personalRoom.Dormitory;
-            newPersonalRoom.Equipments = personalRoom.Equipments;
-
-            await _context.Room.AddAsync(newPersonalRoom);
-            await _context.SaveChangesAsync();
+            throw new RoomWithNumberExistsException();
         }
-        if (room is SharedRoomDto sharedRoom)
-        {
-            ObjectValidatorService<SharedRoomDto> sr = new ObjectValidatorService<SharedRoomDto>(sharedRoom);
-            sr.IsValid();
-            SharedRoom newSharedRoom = new SharedRoom();
-            newSharedRoom.Floor = sharedRoom.Floor;
-            newSharedRoom.DormitoryId = sharedRoom.DormitoryId;
-            newSharedRoom.Dormitory = sharedRoom.Dormitory;
-            newSharedRoom.Equipments = sharedRoom.Equipments;
-            newSharedRoom.PersonInCharge = sharedRoom.PersonInCharge;
-            newSharedRoom.PersonInChargeContact = sharedRoom.PersonInChargeContact;
-            await _context.Room.AddAsync(newSharedRoom);
-            await _context.SaveChangesAsync();
-        }
+        await _context.Room.AddAsync(_mapper.Map<PersonalRoom>(room));
+        await _context.SaveChangesAsync();
     }
 
-    public async Task Update(int id, RoomDto room)
+    public async Task CreateSharedRoom(SharedRoomCreateDto room)
     {
-        //Itt valamiért nem jól ellenőrzi a required attribútumokat!!!!!!!!!!!!!!!!
-        //És ha nem adod meg egyáltalán az adott attribútumot, akkor is az a default érték lesz
-        ObjectValidatorService<RoomDto> v = new ObjectValidatorService<RoomDto>(room);
-        v.IsValid();
-        string givenroomtype = room.GetType().Name;
-        Room oldRoom = _context.Room.AsNoTracking().FirstOrDefault(r => r.Id == id);
+        if (!_context.Dormitory.Any(d => d.Id == room.DormitoryId))
+        {
+            throw new DormitoryWithIdNotExistsException();
+        }
+        await _context.Room.AddAsync(_mapper.Map<SharedRoom>(room));
+        await _context.SaveChangesAsync();
+    }
+
+    public async Task UpdatePersonalRoom(int id, PersonalRoomCreateDto room)
+    {
+        PersonalRoom oldRoom = await _context.Room.OfType<PersonalRoom>().FirstOrDefaultAsync(r => r.Id == id);
         if (oldRoom == null)
         {
             throw new RoomWithIdNotExistsException();
         }
-        if (oldRoom.GetType().Name != givenroomtype)
+        if (!_context.Dormitory.Any(d => d.Id == room.DormitoryId))
         {
-            throw new RoomRoomTypeNotMatchException();
+            throw new DormitoryWithIdNotExistsException();
+        }
+        if (oldRoom.Number != room.Number && _context.Room.OfType<PersonalRoom>().Any(pr => pr.Number == room.Number))
+        {
+            throw new RoomWithNumberExistsException();
+        }
+        _mapper.Map(room, oldRoom);
+        _context.Room.Update(oldRoom);
+        await _context.SaveChangesAsync();
+    }
+    public async Task UpdateSharedRoom(int id, SharedRoomCreateDto room)
+    {
+        SharedRoom oldRoom = await _context.Room.OfType<SharedRoom>().FirstOrDefaultAsync(r => r.Id == id);
+        if (oldRoom == null)
+        {
+            throw new RoomWithIdNotExistsException();
         }
         if (!_context.Dormitory.Any(d => d.Id == room.DormitoryId))
         {
             throw new DormitoryWithIdNotExistsException();
         }
-        if (room is PersonalRoomDto personalRoom)
-        {
-            ObjectValidatorService<PersonalRoomDto> pr = new ObjectValidatorService<PersonalRoomDto>(personalRoom);
-            pr.IsValid();
-
-            PersonalRoom oldPersonalRoom = (PersonalRoom)oldRoom;
-            if (oldPersonalRoom.Number != personalRoom.Number && _context.Room.OfType<PersonalRoom>().Any(pr => pr.Number == personalRoom.Number))
-            {
-                throw new RoomWithNumberExistsException();
-            }
-            PersonalRoom newPersonalRoom = _context.PersonalRoom.First(r => r.Id == id);
-            newPersonalRoom.Number = personalRoom.Number;
-            //newPersonalRoom.Residents = personalRoom.Residents;
-            newPersonalRoom.Floor = personalRoom.Floor;
-            newPersonalRoom.DormitoryId = personalRoom.DormitoryId;
-            newPersonalRoom.Dormitory = personalRoom.Dormitory;
-            newPersonalRoom.Equipments = personalRoom.Equipments;
-            _context.Room.Update(newPersonalRoom);
-            await _context.SaveChangesAsync();
-        }
-        if (room is SharedRoomDto sharedRoom)
-        {
-            ObjectValidatorService<SharedRoomDto> sr = new ObjectValidatorService<SharedRoomDto>(sharedRoom);
-            sr.IsValid();
-            SharedRoom newSharedRoom = _context.SharedRoom.First(r => r.Id == id);
-            newSharedRoom.Floor = sharedRoom.Floor;
-            newSharedRoom.DormitoryId = sharedRoom.DormitoryId;
-            newSharedRoom.Dormitory = sharedRoom.Dormitory;
-            newSharedRoom.Equipments = sharedRoom.Equipments;
-            newSharedRoom.PersonInCharge = sharedRoom.PersonInCharge;
-            newSharedRoom.PersonInChargeContact = sharedRoom.PersonInChargeContact;
-            _context.Room.Update(newSharedRoom);
-            await _context.SaveChangesAsync();
-        }
+        _mapper.Map(room, oldRoom);
+        _context.Room.Update(oldRoom);
+        await _context.SaveChangesAsync();
     }
 
     public async Task Delete(int id)

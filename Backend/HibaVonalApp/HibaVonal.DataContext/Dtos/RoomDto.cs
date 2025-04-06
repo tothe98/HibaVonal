@@ -3,7 +3,7 @@ using HibaVonal.DataContext.Entities;
 
 namespace HibaVonal.DataContext.Dtos;
 
-public abstract class RoomDto
+public class RoomDto
 {
     public int Id { get; set; }
 
@@ -22,6 +22,22 @@ public class PersonalRoomDto : RoomDto
     public int Number { get; set; }
     public List<UserDataDto> Residents { get; set; }
 }
+
+public class PersonalRoomCreateDto
+{
+    public int Floor { get; set; }
+    public int DormitoryId { get; set; }
+    public int Number { get; set; }
+}
+
+public class SharedRoomCreateDto
+{
+    public int Floor { get; set; }
+    public int DormitoryId { get; set; }
+    public string PersonInCharge { get; set; }
+    public string PersonInChargeContact { get; set; }
+}
+
 public class SharedRoomDto : RoomDto
 {
     public string PersonInCharge { get; set; }
