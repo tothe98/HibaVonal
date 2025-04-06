@@ -1,4 +1,5 @@
-﻿using Hibavonal.DataContext.Entities;
+﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
@@ -21,10 +22,12 @@ namespace HibaVonal.Services.Services
     {
         private SQL _context;
         private TokenHandlerService _tokenHandler;
-        public AuthService(SQL context, TokenHandlerService tokenHandlerService)
+        private readonly IMapper _mapper;
+        public AuthService(SQL context, TokenHandlerService tokenHandlerService, IMapper mapper)
         {
             _context = context;
             _tokenHandler = tokenHandlerService;
+            _mapper = mapper;
         }
 
         public async Task<AccessTokenDto> Login(LoginDto loginData)
@@ -46,12 +49,7 @@ namespace HibaVonal.Services.Services
                     AccessTokenDto token = new AccessTokenDto();
                     token.Token = _tokenHandler.GenerateToken(user).Token;
                     token.ExpireAt = DateTime.Now.AddHours(24);
-                    token.UserData = new UserDataDto()
-                    {
-                        Email = user.Email,
-                        Name = user.Name,
-                        Roles = user.Roles
-                    };
+                    token.UserData = _mapper.Map<UserDataDto>(user); 
                     return token;
                 }
                 else
@@ -100,12 +98,7 @@ namespace HibaVonal.Services.Services
                     _context.UserRole.Add(userRole);
                     await _context.SaveChangesAsync();
 
-                    return new UserDataDto()
-                    {
-                        Email = user.Email,
-                        Name = user.Name,
-                        Roles = user.Roles
-                    };
+                    return _mapper.Map<UserDataDto>(user);
                 }
             }
 

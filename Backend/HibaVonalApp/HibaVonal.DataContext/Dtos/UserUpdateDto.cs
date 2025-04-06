@@ -11,4 +11,6 @@ public class UserUpdateDto
     public string PhoneNumber { get; set; }
 
     public int? PersonalRoomId { get; set; }
+
+    public bool IsDeleted { get; set; } = false;
 }

@@ -1,4 +1,5 @@
-﻿using HibaVonal.DataContext;
+﻿using AutoMapper;
+using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
 using HibaVonal.Services.Exceptions;
@@ -9,35 +10,34 @@ namespace HibaVonal.Services.Services
 
     public interface IUserService
     {
-        Task<IEnumerable<User>> List();
-        Task<User> GetById(int id);
-        Task<User> GetByEmail(string email);
-        Task<User> Update(UserUpdateDto user);
+        Task<List<UserDataDto>> List();
+        Task<UserDataDto> GetById(int id);
+        Task<UserDataDto> GetByEmail(string email);
+        Task<UserDataDto> Update(UserUpdateDto user);
         Task Delete(int id);
     }
 
     public class UserService : IUserService
     {
-        SQL _context;
-        public UserService(SQL context)
+        private readonly SQL _context;
+        private readonly IMapper _mapper;
+        public UserService(SQL context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<IEnumerable<User>> List()
+        public async Task<List<UserDataDto>> List()
         {
-            List<User> users = await _context.User.ToListAsync();
-            users.ForEach(u => u.Password = null);
-            return users;
+            return await _context.User.Include(r=>r.Roles).ThenInclude(ro=>ro.Role).Select(u=>_mapper.Map<UserDataDto>(u)).ToListAsync();
         }
 
-        public async Task<User> GetById(int id)
+        public async Task<UserDataDto> GetById(int id)
         {
-            User user = await _context.User.FirstOrDefaultAsync(u => u.Id == id);
+            User user = await _context.User.Include(u=>u.Roles).ThenInclude(r=>r.Role).FirstOrDefaultAsync(u => u.Id == id);
             if (user != null)
             {
-                user.Password = null;
-                return user;
+                return _mapper.Map<UserDataDto>(user);
             }
             else
             {
@@ -45,13 +45,12 @@ namespace HibaVonal.Services.Services
             }
         }
 
-        public async Task<User> GetByEmail(string email)
+        public async Task<UserDataDto> GetByEmail(string email)
         {
-            User user = await _context.User.FirstOrDefaultAsync(u => u.Email == email);
+            User user = await _context.User.Include(r => r.Roles).ThenInclude(ro => ro.Role).FirstOrDefaultAsync(u => u.Email == email);
             if (user != null)
             {
-                user.Password = null;
-                return user;
+                return _mapper.Map<UserDataDto>(user);
 
             }
             else
@@ -60,10 +59,8 @@ namespace HibaVonal.Services.Services
             }
         }
 
-        public async Task<User> Update(UserUpdateDto user)
+        public async Task<UserDataDto> Update(UserUpdateDto user)
         {
-            ObjectValidatorService<UserUpdateDto> objectValidatorService = new ObjectValidatorService<UserUpdateDto>(user);
-            objectValidatorService.IsValid();
             User updatingUser = await _context.User.FirstOrDefaultAsync(u => u.Id == user.Id);
             if (updatingUser == null)
             {
@@ -74,8 +71,8 @@ namespace HibaVonal.Services.Services
             updatingUser.PhoneNumber = user.PhoneNumber;
             updatingUser.PersonalRoomId = user.PersonalRoomId;
             await _context.SaveChangesAsync();
-            updatingUser.Password = null;
-            return updatingUser;
+            var updatedUser = await _context.User.Include(r => r.Roles).ThenInclude(ro => ro.Role).FirstOrDefaultAsync(u => u.Id == user.Id);
+            return _mapper.Map<UserDataDto>(updatedUser);
         }
 
         public async Task Delete(int id)

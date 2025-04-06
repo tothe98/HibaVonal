@@ -23,7 +23,7 @@ public class OrderItemController : ControllerBase
         return await _orderItemService.List();
     }
 
-    [HttpPost]
+    /*[HttpPost]
     public async Task<IActionResult> Create([FromBody] OrderItemDto orderItem)
     {
         APIResponse response = new APIResponse();
@@ -118,5 +118,5 @@ public class OrderItemController : ControllerBase
             response.Message = ex.InnerException?.Message;
         }
         return BadRequest(response);
-    }
+    }*/
 }

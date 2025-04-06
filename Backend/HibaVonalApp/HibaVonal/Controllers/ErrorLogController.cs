@@ -6,171 +6,124 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using HibaVonal.DataContext;
-using Hibavonal.DataContext.Entities;
+using HibaVonal.Services.Services;
+using HibaVonal.DataContext.Dtos;
+using LibraryCommon.Models;
+using HibaVonal.Services.Exceptions;
 
 namespace HibaVonal.Controllers
 {
-    public class ErrorLogsController : Controller
+    [ApiController]
+    [Route("[controller]")]
+    public class ErrorLogsController : ControllerBase
     {
-        private readonly SQL _context;
+        private readonly IErrorLogService _errorLogService;
 
-        public ErrorLogsController(SQL context)
+        public ErrorLogsController(IErrorLogService errorLogService)
         {
-            _context = context;
+            _errorLogService = errorLogService;
         }
 
-        // GET: ErrorLogs
-        public async Task<IActionResult> Index()
+        [HttpGet]
+        public async Task<ActionResult<List<ErrorLogDto>>> List()
         {
-            var sQL = _context.ErrorLog.Include(e => e.MaintenanceWorker).Include(e => e.Reporter).Include(e => e.Room);
-            return View(await sQL.ToListAsync());
+            return await _errorLogService.List();
         }
 
-        // GET: ErrorLogs/Details/5
-        public async Task<IActionResult> Details(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var errorLog = await _context.ErrorLog
-                .Include(e => e.MaintenanceWorker)
-                .Include(e => e.Reporter)
-                .Include(e => e.Room)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (errorLog == null)
-            {
-                return NotFound();
-            }
-
-            return View(errorLog);
-        }
-
-        // GET: ErrorLogs/Create
-        public IActionResult Create()
-        {
-            ViewData["MaintenanceWorkerId"] = new SelectList(_context.User, "Id", "Email");
-            ViewData["ReporterId"] = new SelectList(_context.User, "Id", "Email");
-            ViewData["RoomId"] = new SelectList(_context.Room, "Id", "RoomType");
-            return View();
-        }
-
-        // POST: ErrorLogs/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ReportTime,Description,Comment,Status,Level,RoomId,MaintenanceWorkerId,ReporterId")] ErrorLog errorLog)
+        public async Task<ActionResult<ErrorLogDto>> Create([FromBody] ErrorLogCreateDto errorLogCreateDto)
         {
-            if (ModelState.IsValid)
+            APIResponse response = new APIResponse();
+            try
             {
-                _context.Add(errorLog);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                var result = await _errorLogService.Create(errorLogCreateDto);
+                response.Data = result;
+                response.StatusCode = 200;
+                response.Message = "Error log created successfully.";
+                return Ok(response);
             }
-            ViewData["MaintenanceWorkerId"] = new SelectList(_context.User, "Id", "Email", errorLog.MaintenanceWorkerId);
-            ViewData["ReporterId"] = new SelectList(_context.User, "Id", "Email", errorLog.ReporterId);
-            ViewData["RoomId"] = new SelectList(_context.Room, "Id", "RoomType", errorLog.RoomId);
-            return View(errorLog);
+            catch (ReporterWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (MaintenanceWorkerWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.InnerException?.Message;
+            }
+
+            return BadRequest(response);
         }
 
-        // GET: ErrorLogs/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        [HttpPut("{id}")]
+        public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] ErrorLogCreateDto errorLogUpdateDto)
         {
-            if (id == null)
+            APIResponse response = new APIResponse();
+            try
             {
-                return NotFound();
+                var result = await _errorLogService.Update(id, errorLogUpdateDto);
+                response.Data = result;
+                response.StatusCode = 200;
+                response.Message = "Error log updated successfully.";
+                return Ok(response);
+            }
+            catch (ErrorLogWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (ReporterWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (MaintenanceWorkerWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.InnerException?.Message;
             }
 
-            var errorLog = await _context.ErrorLog.FindAsync(id);
-            if (errorLog == null)
-            {
-                return NotFound();
-            }
-            ViewData["MaintenanceWorkerId"] = new SelectList(_context.User, "Id", "Email", errorLog.MaintenanceWorkerId);
-            ViewData["ReporterId"] = new SelectList(_context.User, "Id", "Email", errorLog.ReporterId);
-            ViewData["RoomId"] = new SelectList(_context.Room, "Id", "RoomType", errorLog.RoomId);
-            return View(errorLog);
+            return BadRequest(response);
         }
 
-        // POST: ErrorLogs/Edit/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,ReportTime,Description,Comment,Status,Level,RoomId,MaintenanceWorkerId,ReporterId")] ErrorLog errorLog)
+
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<APIResponse>> Delete(int id)
         {
-            if (id != errorLog.Id)
+            APIResponse response = new APIResponse();
+            try
             {
-                return NotFound();
+                await _errorLogService.Delete(id);
+                response.StatusCode = 200;
+                response.Message = "Error log deleted successfully.";
+                return Ok(response);
+            }
+            catch (ErrorLogWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.InnerException?.Message;
             }
 
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(errorLog);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ErrorLogExists(errorLog.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["MaintenanceWorkerId"] = new SelectList(_context.User, "Id", "Email", errorLog.MaintenanceWorkerId);
-            ViewData["ReporterId"] = new SelectList(_context.User, "Id", "Email", errorLog.ReporterId);
-            ViewData["RoomId"] = new SelectList(_context.Room, "Id", "RoomType", errorLog.RoomId);
-            return View(errorLog);
+            return BadRequest(response);
         }
 
-        // GET: ErrorLogs/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
 
-            var errorLog = await _context.ErrorLog
-                .Include(e => e.MaintenanceWorker)
-                .Include(e => e.Reporter)
-                .Include(e => e.Room)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (errorLog == null)
-            {
-                return NotFound();
-            }
-
-            return View(errorLog);
-        }
-
-        // POST: ErrorLogs/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
-        {
-            var errorLog = await _context.ErrorLog.FindAsync(id);
-            if (errorLog != null)
-            {
-                _context.ErrorLog.Remove(errorLog);
-            }
-
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool ErrorLogExists(int id)
-        {
-            return _context.ErrorLog.Any(e => e.Id == id);
-        }
     }
 }

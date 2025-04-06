@@ -19,14 +19,14 @@ namespace HibaVonal.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<User>> List()
+        public async Task<List<UserDataDto>> List()
         {
             return await _userService.List();
 
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetById(int id)
+        public async Task<ActionResult<APIResponse>> GetById(int id)
         {
             APIResponse response = new APIResponse();
             try
@@ -51,7 +51,7 @@ namespace HibaVonal.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetByEmail(string email)
+        public async Task<ActionResult<APIResponse>> GetByEmail(string email)
         {
             APIResponse response = new APIResponse();
             try
@@ -76,7 +76,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpPut]
-        public async Task<IActionResult> Update([FromBody] UserUpdateDto user)
+        public async Task<ActionResult<APIResponse>> Update([FromBody] UserUpdateDto user)
         {
             APIResponse response = new APIResponse();
             try
@@ -121,7 +121,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpDelete]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<ActionResult<APIResponse>> Delete(int id)
         {
             APIResponse response = new APIResponse();
             try

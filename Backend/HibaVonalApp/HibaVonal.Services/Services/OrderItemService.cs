@@ -9,9 +9,9 @@ namespace HibaVonal.Services.Services;
 public interface IOrderItemService
 {
     Task<IEnumerable<OrderItem>> List();
-    Task Create(OrderItemDto orderItem);
+   /* Task Create(OrderItemDto orderItem);
     Task Update(int id, OrderItemDto orderItem);
-    Task Delete(int id);
+    Task Delete(int id);*/
 }
 
 public class OrderItemService : IOrderItemService
@@ -27,7 +27,7 @@ public class OrderItemService : IOrderItemService
         return await _context.OrderItem.Include(o => o.Equipment).Include(o => o.Order).ToListAsync();
     }
 
-    public async Task Create(OrderItemDto orderItem)
+   /* public async Task Create(OrderItemCreateDto orderItem)
     {
         ObjectValidatorService<OrderItemDto> v = new ObjectValidatorService<OrderItemDto>(orderItem);
         v.IsValid();
@@ -89,5 +89,5 @@ public class OrderItemService : IOrderItemService
         }
         _context.OrderItem.Remove(orderItem);
         await _context.SaveChangesAsync();
-    }
+    }*/
 }

@@ -18,18 +18,19 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<IEnumerable<Order>> List()
+    public async Task<List<OrderDto>> List()
     {
         return await _orderService.List();
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] OrderDto order)
+    public async Task<ActionResult<APIResponse>> Create([FromBody] OrderCreateDto order)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _orderService.Create(order);
+            var result = await _orderService.Create(order);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "Order added successfully";
             return Ok(response);
@@ -47,13 +48,14 @@ public class OrderController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpPost]
-    public async Task<IActionResult> Update(int id , OrderDto order)
+    [HttpPut("{id}")]
+    public async Task<ActionResult<APIResponse>> Update(int id , OrderCreateDto order)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _orderService.Update(id, order);
+            var result = await _orderService.Update(id, order);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "Order updated successfully";
             return Ok(response);
@@ -76,7 +78,7 @@ public class OrderController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         APIResponse response = new APIResponse();
