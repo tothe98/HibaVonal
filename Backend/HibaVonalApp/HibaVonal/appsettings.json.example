@@ -7,6 +7,11 @@
   },
   "AllowedHosts": "*",
   "ConnectionStrings": {
-    "DefaultConnection": "Server=IP;Database=HibaVonal;User Id=User;Password=Password;MultipleActiveResultSets=true;"
+    "SQL": ""
+  },
+  "JWT": {
+    "Key": "key",
+    "Audience": "audience",
+    "Issuer": "Issuer"
   }
 }

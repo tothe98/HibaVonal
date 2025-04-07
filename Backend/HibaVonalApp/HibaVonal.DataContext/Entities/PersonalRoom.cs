@@ -1,3 +1,4 @@
+using HibaVonal.DataContext.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Hibavonal.DataContext.Entities;
@@ -5,8 +6,7 @@ namespace Hibavonal.DataContext.Entities;
 public class PersonalRoom : Room
 {
     [Required]
-    public int Nubmer { get; set; }
+    public int Number { get; set; }
 
-    [Required]
-    public IList<User> Residents { get; set; }
+    public ICollection<User>? Residents { get; set; } = new List<User>();
 }

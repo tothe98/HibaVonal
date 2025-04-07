@@ -11,8 +11,7 @@ public class Equipment
     [Required]
     public string Name { get; set; }
 
-    public int ErrorTypeId { get; set; }
-
-    [Required, ForeignKey("ErrorTypeId")]
-    public ErrorType ErrorType { get; set; }
+    public int? ErrorTypeId { get; set; }
+    [ForeignKey("ErrorTypeId")]
+    public ErrorType? ErrorType { get; set; }
 }

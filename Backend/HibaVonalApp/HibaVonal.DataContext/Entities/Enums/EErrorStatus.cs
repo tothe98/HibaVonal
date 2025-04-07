@@ -1,4 +1,4 @@
-public enum ErrorStatus
+public enum EErrorStatus
 {
     Recieved,
     Scheduled,

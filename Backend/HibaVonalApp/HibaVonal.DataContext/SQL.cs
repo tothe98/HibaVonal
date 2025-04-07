@@ -1,5 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using HibaVonal.DataContext.Entities;
+using Hibavonal.DataContext.Entities;
+using System.Reflection.Metadata;
 
 namespace HibaVonal.DataContext;
 
@@ -8,6 +10,9 @@ public class SQL : DbContext
     public SQL(DbContextOptions options) : base(options) { }
 
     public DbSet<Role> Role { get; set; }
+    public DbSet<Room> Room { get; set; }
+    public DbSet<PersonalRoom> PersonalRoom { get; set; }
+    public DbSet<SharedRoom> SharedRoom { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<OrderItem> OrderItem { get; set; }
     public DbSet<Order> Order { get; set; }
@@ -15,7 +20,15 @@ public class SQL : DbContext
     public DbSet<Dormitory> Dormitory { get; set; }
     public DbSet<ErrorType> ErrorType { get; set; }
     public DbSet<Equipment> Equipment { get; set; }
-    public DbSet<PersonalRoom> PersonalRoom { get; set; }
-    public DbSet<SharedRoom> SharedRoom { get; set; }
     public DbSet<ErrorLog> ErrorLog { get; set; }
+    public DbSet<UserRole> UserRole { get; set; }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Room>()
+            .HasDiscriminator<string>("RoomType")
+            .HasValue<PersonalRoom>("PersonalRoom")
+            .HasValue<SharedRoom>("SharedRoom");
+
+        modelBuilder.Entity<UserRole>().HasKey("UserId", "RoleId");
+    }
 }

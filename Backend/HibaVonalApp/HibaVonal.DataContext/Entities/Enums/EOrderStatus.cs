@@ -1,4 +1,4 @@
-public enum OrderStatus
+public enum EOrderStatus
 {
     Declined,
     Accepted,
