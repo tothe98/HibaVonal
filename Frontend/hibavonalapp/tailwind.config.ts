@@ -6,6 +6,12 @@ export default {
         "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
         "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
     ],
+    safelist: [
+        "text-err-critical",
+        "text-err-high",
+        "text-err-medium",
+        "text-err-low",
+    ],
     theme: {
         extend: {
             colors: {
