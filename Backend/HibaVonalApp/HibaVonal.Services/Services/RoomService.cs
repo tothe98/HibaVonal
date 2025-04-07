@@ -10,10 +10,10 @@ namespace HibaVonal.Services.Services;
 public interface IRoomService
 {
     Task<IEnumerable<RoomDto>> List();
-    Task CreatePersonalRoom(PersonalRoomCreateDto room);
-    Task CreateSharedRoom(SharedRoomCreateDto room);
-    Task UpdatePersonalRoom(int id, PersonalRoomCreateDto room);
-    Task UpdateSharedRoom(int id, SharedRoomCreateDto room);
+    Task<PersonalRoomDto> CreatePersonalRoom(PersonalRoomCreateDto room);
+    Task<SharedRoomDto> CreateSharedRoom(SharedRoomCreateDto room);
+    Task<PersonalRoomDto> UpdatePersonalRoom(int id, PersonalRoomCreateDto room);
+    Task<SharedRoomDto> UpdateSharedRoom(int id, SharedRoomCreateDto room);
     Task Delete(int id);
 }
 
@@ -29,29 +29,25 @@ public class RoomService : IRoomService
 
     public async Task<IEnumerable<RoomDto>> List()
     {
-        List<RoomDto> roomDtos = new List<RoomDto>();
-        var rooms = await _context.Room.Include(r => r.Dormitory).ToListAsync();
-        rooms.ForEach(room =>
+        List<Room> rooms = new List<Room>();
+        var result = await _context.Room.Include(r => r.Dormitory).ToListAsync();
+        result.ForEach(room =>
         {
             if (room is PersonalRoom personalRoom)
             {
-                var result = _mapper.Map<PersonalRoomDto>((PersonalRoom)personalRoom);
-                result.RoomType = "PersonalRoom";
-                roomDtos.Add(result);
-
+                rooms.Add((PersonalRoom)room);
             }
             else if (room is SharedRoom sharedRoom)
             {
-                var result = _mapper.Map<SharedRoomDto>((SharedRoom)sharedRoom);
-                result.RoomType = "SharedRoom";
-                roomDtos.Add(result);
+                rooms.Add((SharedRoom)sharedRoom);
             }
         });
-        IEnumerable<RoomDto> res = roomDtos;
-        return res;
+
+        var roomsDto = _mapper.Map<IEnumerable<RoomDto>>(rooms);
+        return roomsDto;
     }
 
-    public async Task CreatePersonalRoom(PersonalRoomCreateDto room)
+    public async Task<PersonalRoomDto> CreatePersonalRoom(PersonalRoomCreateDto room)
     {
         if (!_context.Dormitory.Any(d => d.Id == room.DormitoryId))
         {
@@ -61,21 +57,25 @@ public class RoomService : IRoomService
         {
             throw new RoomWithNumberExistsException();
         }
-        await _context.Room.AddAsync(_mapper.Map<PersonalRoom>(room));
+        var result = await _context.Room.AddAsync(_mapper.Map<PersonalRoom>(room));
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<PersonalRoomDto>(await _context.Room.OfType<PersonalRoom>().Include(d => d.Dormitory).FirstOrDefaultAsync(r => r.Id == result.Entity.Id));
     }
 
-    public async Task CreateSharedRoom(SharedRoomCreateDto room)
+    public async Task<SharedRoomDto> CreateSharedRoom(SharedRoomCreateDto room)
     {
         if (!_context.Dormitory.Any(d => d.Id == room.DormitoryId))
         {
             throw new DormitoryWithIdNotExistsException();
         }
-        await _context.Room.AddAsync(_mapper.Map<SharedRoom>(room));
+        var result = await _context.Room.AddAsync(_mapper.Map<SharedRoom>(room));
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<SharedRoomDto>(await _context.Room.OfType<SharedRoom>().Include(d=>d.Dormitory).FirstOrDefaultAsync(r => r.Id == result.Entity.Id));
     }
 
-    public async Task UpdatePersonalRoom(int id, PersonalRoomCreateDto room)
+    public async Task<PersonalRoomDto> UpdatePersonalRoom(int id, PersonalRoomCreateDto room)
     {
         PersonalRoom oldRoom = await _context.Room.OfType<PersonalRoom>().FirstOrDefaultAsync(r => r.Id == id);
         if (oldRoom == null)
@@ -93,8 +93,10 @@ public class RoomService : IRoomService
         _mapper.Map(room, oldRoom);
         _context.Room.Update(oldRoom);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<PersonalRoomDto>(await _context.Room.OfType<PersonalRoom>().Include(d => d.Dormitory).FirstOrDefaultAsync(r => r.Id == id));
     }
-    public async Task UpdateSharedRoom(int id, SharedRoomCreateDto room)
+    public async Task<SharedRoomDto> UpdateSharedRoom(int id, SharedRoomCreateDto room)
     {
         SharedRoom oldRoom = await _context.Room.OfType<SharedRoom>().FirstOrDefaultAsync(r => r.Id == id);
         if (oldRoom == null)
@@ -108,6 +110,8 @@ public class RoomService : IRoomService
         _mapper.Map(room, oldRoom);
         _context.Room.Update(oldRoom);
         await _context.SaveChangesAsync();
+
+        return _mapper.Map<SharedRoomDto>(await _context.Room.OfType<SharedRoom>().Include(d => d.Dormitory).FirstOrDefaultAsync(r => r.Id == id));
     }
 
     public async Task Delete(int id)

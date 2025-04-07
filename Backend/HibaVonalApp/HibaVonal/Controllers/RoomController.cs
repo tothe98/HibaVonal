@@ -24,12 +24,13 @@ public class RoomController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreatePersonalRoom([FromBody] PersonalRoomCreateDto room)
+    public async Task<ActionResult<APIResponse>> CreatePersonalRoom([FromBody] PersonalRoomCreateDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.CreatePersonalRoom(room);
+            var result = await _roomService.CreatePersonalRoom(room);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "PersonalRoom added successfully";
             return Ok(response);
@@ -62,12 +63,13 @@ public class RoomController : ControllerBase
         return BadRequest(response);
     }
     [HttpPost]
-    public async Task<IActionResult> CreateSharedRoom([FromBody] SharedRoomCreateDto room)
+    public async Task<ActionResult<APIResponse>> CreateSharedRoom([FromBody] SharedRoomCreateDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.CreateSharedRoom(room);
+            var result = await _roomService.CreateSharedRoom(room);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "SharedRoom added successfully";
             return Ok(response);
@@ -101,12 +103,13 @@ public class RoomController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdatePersonalRoom(int id ,PersonalRoomCreateDto room)
+    public async Task<ActionResult<APIResponse>> UpdatePersonalRoom(int id ,PersonalRoomCreateDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.UpdatePersonalRoom(id , room);
+            var result = await _roomService.UpdatePersonalRoom(id , room);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "PersonalRoom updated successfully";
             return Ok(response);
@@ -145,12 +148,13 @@ public class RoomController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateSharedRoom(int id, SharedRoomCreateDto room)
+    public async Task<ActionResult<APIResponse>> UpdateSharedRoom(int id, SharedRoomCreateDto room)
     {
         APIResponse response = new APIResponse();
         try
         {
-            await _roomService.UpdateSharedRoom(id, room);
+            var result = await _roomService.UpdateSharedRoom(id, room);
+            response.Data = result;
             response.StatusCode = 200;
             response.Message = "SharedRoom updated successfully";
             return Ok(response);
