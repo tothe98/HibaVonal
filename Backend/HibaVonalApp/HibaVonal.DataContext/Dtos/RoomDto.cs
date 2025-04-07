@@ -1,8 +1,12 @@
 using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext.Entities;
+using System.Text.Json.Serialization;
 
 namespace HibaVonal.DataContext.Dtos;
 
+[JsonPolymorphic(TypeDiscriminatorPropertyName = "roomType")]
+[JsonDerivedType(typeof(SharedRoomDto), "SharedRoom")]
+[JsonDerivedType(typeof(PersonalRoomDto), "PersonalRoom")]
 public class RoomDto
 {
     public int Id { get; set; }

@@ -72,7 +72,6 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<IDormitoryService, DormitoryService>();
 builder.Services.AddScoped<IErrorTypeService, ErrorTypeService>();
 builder.Services.AddScoped<IEquipmentService, EquipmentService>();
-builder.Services.AddScoped<IOrderItemService, OrderItemService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IRoomService, RoomService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
