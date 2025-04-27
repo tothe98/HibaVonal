@@ -10,6 +10,7 @@ using HibaVonal.Services.Services;
 using HibaVonal.DataContext.Dtos;
 using LibraryCommon.Models;
 using HibaVonal.Services.Exceptions;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HibaVonal.Controllers
 {
@@ -25,12 +26,14 @@ namespace HibaVonal.Controllers
         }
 
         [HttpGet]
+        [Authorize("MaintenanceManager")]
         public async Task<ActionResult<List<ErrorLogDto>>> List()
         {
             return await _errorLogService.List();
         }
 
         [HttpPost]
+        [Authorize("User")]
         public async Task<ActionResult<ErrorLogDto>> Create([FromBody] ErrorLogCreateDto errorLogCreateDto)
         {
             APIResponse response = new APIResponse();
@@ -62,6 +65,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize("MaintenanceWorker")]
         public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] ErrorLogCreateDto errorLogUpdateDto)
         {
             APIResponse response = new APIResponse();
@@ -100,6 +104,7 @@ namespace HibaVonal.Controllers
 
 
         [HttpDelete("{id}")]
+        [Authorize("MaintenanceManager")]
         public async Task<ActionResult<APIResponse>> Delete(int id)
         {
             APIResponse response = new APIResponse();

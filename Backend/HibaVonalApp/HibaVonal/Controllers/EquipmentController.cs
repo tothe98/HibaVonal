@@ -4,6 +4,7 @@ using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using HibaVonal.DataContext.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HibaVonal.Controllers;
 
@@ -18,6 +19,7 @@ public class EquipmentController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize("MaintenanceWorker")]
     public async Task<ActionResult<List<EquipmentDto>>> List()
     {
         try
@@ -36,6 +38,7 @@ public class EquipmentController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize("Admin")]
     public async Task<ActionResult<APIResponse>> Create([FromBody] EquipmentCreateDto equipment)
     {
         APIResponse response = new APIResponse();
@@ -71,6 +74,7 @@ public class EquipmentController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize("MaintenanceWorker")]
     public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] EquipmentUpdateDto equipment)
     {
         APIResponse response = new APIResponse();
@@ -106,6 +110,7 @@ public class EquipmentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize("Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         APIResponse response = new APIResponse();

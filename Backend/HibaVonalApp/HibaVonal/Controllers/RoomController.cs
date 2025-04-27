@@ -4,11 +4,13 @@ using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using HibaVonal.DataContext.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HibaVonal.Controllers;
 
 [ApiController]
 [Route("api/[controller]/[action]")]
+[Authorize("Admin")]
 public class RoomController : ControllerBase
 {
     private readonly IRoomService _roomService;

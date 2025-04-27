@@ -5,6 +5,7 @@ using HibaVonal.Services.Services;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using HibaVonal.DataContext.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HibaVonal.Controllers;
 [ApiController]
@@ -24,6 +25,7 @@ public class ErrorTypeController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize("Admin")]
     public async Task<IActionResult> Create([FromBody] ErrorTypeCreateUpdateDto errorType)
     {
         APIResponse response = new APIResponse();
@@ -59,6 +61,7 @@ public class ErrorTypeController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize("Admin")]
     public async Task<IActionResult> Update(int id, ErrorTypeCreateUpdateDto errorType)
     {
         APIResponse response = new APIResponse();
@@ -89,6 +92,7 @@ public class ErrorTypeController : ControllerBase
     }
 
     [HttpDelete]
+    [Authorize("Admin")]
     public async Task<IActionResult> Delete(int id)
     {
         APIResponse response = new APIResponse();
