@@ -64,6 +64,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpPost]
+        [Authorize("Admin")]
         public async Task<IActionResult> Registration([FromBody] RegisterDto register)
         {
             APIResponse response = new APIResponse();

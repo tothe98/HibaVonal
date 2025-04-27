@@ -3,6 +3,7 @@ using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using HibaVonal.DataContext.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HibaVonal.Controllers;
 
@@ -18,6 +19,7 @@ public class AddressController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize("Admin")]
     public async Task<ActionResult<List<AddressDto>>> List()
     {
         try
@@ -36,6 +38,7 @@ public class AddressController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize("Admin")]
     public async Task<ActionResult<APIResponse>> Create([FromBody] AddressCreateDto address)
     {
         try
@@ -75,6 +78,7 @@ public class AddressController : ControllerBase
     }
 
     [HttpPut("{id}")]
+    [Authorize("Admin")]
     public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] AddressCreateDto address)
     {
         try
@@ -122,6 +126,7 @@ public class AddressController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize("Admin")]
     public async Task<ActionResult<APIResponse>> Delete(int id)
     {
         try

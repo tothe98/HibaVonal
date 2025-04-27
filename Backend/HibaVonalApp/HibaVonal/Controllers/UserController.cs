@@ -3,6 +3,7 @@ using HibaVonal.DataContext.Entities;
 using HibaVonal.Services.Exceptions;
 using HibaVonal.Services.Services;
 using LibraryCommon.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HibaVonal.Controllers
@@ -19,6 +20,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpGet]
+        [Authorize("Admin")]
         public async Task<List<UserDataDto>> List()
         {
             return await _userService.List();
@@ -26,6 +28,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpGet]
+        [Authorize("User")]
         public async Task<ActionResult<APIResponse>> GetById(int id)
         {
             APIResponse response = new APIResponse();
@@ -51,6 +54,7 @@ namespace HibaVonal.Controllers
 
 
         [HttpGet]
+        [Authorize("User")]
         public async Task<ActionResult<APIResponse>> GetByEmail(string email)
         {
             APIResponse response = new APIResponse();
@@ -121,6 +125,7 @@ namespace HibaVonal.Controllers
         }
 
         [HttpDelete]
+        [Authorize("Admin")]
         public async Task<ActionResult<APIResponse>> Delete(int id)
         {
             APIResponse response = new APIResponse();

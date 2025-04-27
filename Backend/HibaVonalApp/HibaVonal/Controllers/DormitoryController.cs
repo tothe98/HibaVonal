@@ -5,10 +5,12 @@ using HibaVonal.Services.Exceptions;
 using LibraryCommon.Models;
 using Microsoft.AspNetCore.Mvc;
 using HibaVonal.DataContext.Dtos;
+using Microsoft.AspNetCore.Authorization;
 
 namespace HibaVonal.Controllers;
 
 [ApiController]
+[Authorize("Admin")]
 [Route("api/[controller]/[action]")]
 public class DormitoryController : ControllerBase
 {
