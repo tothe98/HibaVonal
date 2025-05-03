@@ -194,7 +194,7 @@ public class RoomController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         APIResponse response = new APIResponse();

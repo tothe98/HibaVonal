@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 namespace HibaVonal.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]/[action]")]
     public class ErrorLogsController : ControllerBase
     {
         private readonly IErrorLogService _errorLogService;

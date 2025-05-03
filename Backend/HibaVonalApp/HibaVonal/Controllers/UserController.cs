@@ -27,7 +27,7 @@ namespace HibaVonal.Controllers
 
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [Authorize("User")]
         public async Task<ActionResult<APIResponse>> GetById(int id)
         {
@@ -38,22 +38,65 @@ namespace HibaVonal.Controllers
                 response.Data = await _userService.GetById(id);
                 return Ok(response);
             }
-            catch (NotFoundException ex)
+            catch (NotFoundException e)
             {
                 response.StatusCode = 404;
-                response.Message = ex.Message;
+                response.Message = e.Message;
                 return NotFound(response);
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
                 response.StatusCode = 500;
-                response.Message = ex.Message;
+                response.Message = e.Message;
                 return StatusCode(500, response);
             }
         }
 
-
         [HttpGet]
+        [Authorize("User")]
+        public async Task<ActionResult<APIResponse>> GetCurrent()
+        {
+            APIResponse response = new APIResponse();
+            try
+            {
+                var id = User.FindFirst("id")?.Value;
+                if (string.IsNullOrEmpty(id))
+                {
+                    response.StatusCode = 401;
+                    response.Message = "Unauthorized";
+                    return Unauthorized(response);
+                }
+
+                var user = await _userService.GetById(int.Parse(id));
+                if (user == null)
+                {
+                    throw new NotFoundException("User not found");
+                }
+
+                response.StatusCode = 200;
+                response.Data = new
+                {
+                    name = user.Name,
+                    email = user.Email,
+                    roles = user.Roles
+                };
+                return Ok(response);
+            }
+            catch (NotFoundException e)
+            {
+                response.StatusCode = 404;
+                response.Message = e.Message;
+                return NotFound(response);
+            }
+            catch (Exception e)
+            {
+                response.StatusCode = 500;
+                response.Message = e.Message;
+                return StatusCode(500, response);
+            }
+        }
+
+        [HttpGet("{email}")]
         [Authorize("User")]
         public async Task<ActionResult<APIResponse>> GetByEmail(string email)
         {
@@ -79,7 +122,7 @@ namespace HibaVonal.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<ActionResult<APIResponse>> Update([FromBody] UserUpdateDto user)
         {
             APIResponse response = new APIResponse();
@@ -124,7 +167,7 @@ namespace HibaVonal.Controllers
             }
         }
 
-        [HttpDelete]
+        [HttpDelete("{id}")]
         [Authorize("Admin")]
         public async Task<ActionResult<APIResponse>> Delete(int id)
         {
@@ -141,7 +184,8 @@ namespace HibaVonal.Controllers
                 response.StatusCode = 404;
                 response.Message = ex.Message;
                 return NotFound(response);
-            } catch(Exception ex)
+            }
+            catch (Exception ex)
             {
                 response.StatusCode = 500;
                 response.Message = ex.Message;

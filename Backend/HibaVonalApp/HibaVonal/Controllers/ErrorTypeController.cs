@@ -91,7 +91,7 @@ public class ErrorTypeController : ControllerBase
         return BadRequest(response);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     [Authorize("Admin")]
     public async Task<IActionResult> Delete(int id)
     {

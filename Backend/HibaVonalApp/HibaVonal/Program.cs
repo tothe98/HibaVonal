@@ -62,7 +62,7 @@ string? Issuer = builder.Configuration["JWT:Issuer"];
 builder.Services.AddScoped<TokenHandlerService>(sp => new TokenHandlerService(sp.GetRequiredService<SQL>(), JWTKey, Issuer, Audience));
 
 
-// Database Connection
+// Database connection
 builder.Services.AddDbContext<SQL>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("SQL")));
 
 // Local services
