@@ -39,7 +39,8 @@ namespace HibaVonal.Controllers
             APIResponse response = new APIResponse();
             try
             {
-                var result = await _errorLogService.Create(errorLogCreateDto);
+                var userId = int.Parse(User.FindFirst("id")?.Value);
+                var result = await _errorLogService.Create(userId, errorLogCreateDto);
                 response.Data = result;
                 response.StatusCode = 200;
                 response.Message = "Error log created successfully.";
@@ -66,7 +67,7 @@ namespace HibaVonal.Controllers
 
         [HttpPut("{id}")]
         [Authorize("MaintenanceWorker")]
-        public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] ErrorLogCreateDto errorLogUpdateDto)
+        public async Task<ActionResult<APIResponse>> Update(int id, [FromBody] ErrorLogUpdateDto errorLogUpdateDto)
         {
             APIResponse response = new APIResponse();
             try

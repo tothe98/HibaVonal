@@ -25,6 +25,13 @@ namespace HibaVonal.DataContext.Dtos
 
     public class ErrorLogCreateDto
     {
+        public string Description { get; set; }
+        public EErrorLevel Level { get; set; }
+        public int RoomId { get; set; }
+    }
+
+    public class ErrorLogUpdateDto
+    {
         public DateTime ReportTime { get; set; }
         public string Description { get; set; }
         public string Comment { get; set; }

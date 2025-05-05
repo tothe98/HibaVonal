@@ -76,6 +76,7 @@ namespace HibaVonal.Controllers
                 response.StatusCode = 200;
                 response.Data = new
                 {
+                    id,
                     name = user.Name,
                     email = user.Email,
                     roles = user.Roles
@@ -122,7 +123,8 @@ namespace HibaVonal.Controllers
             }
         }
 
-        [HttpPut("{id}")]
+        [HttpPut]
+        [Authorize]
         public async Task<ActionResult<APIResponse>> Update([FromBody] UserUpdateDto user)
         {
             APIResponse response = new APIResponse();
@@ -130,7 +132,8 @@ namespace HibaVonal.Controllers
             {
                 response.StatusCode = 201;
                 response.Message = "Update is successful";
-                response.Data = await _userService.Update(user);
+                var id = int.Parse(User.FindFirst("id")?.Value);
+                response.Data = await _userService.Update(id, user);
                 return Ok(response);
             }
             catch (MandatoryPropertyEmptyException ex)
@@ -155,6 +158,58 @@ namespace HibaVonal.Controllers
             catch (NotFoundException ex)
             {
                 response.StatusCode = 404;
+                response.Message = ex.Message;
+                return BadRequest(response);
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.Message;
+                return StatusCode(500, response);
+            }
+        }
+
+        [HttpPut]
+        [Authorize]
+        public async Task<ActionResult<APIResponse>> PasswordChange([FromBody] PasswordChangeDto userpassworddto)
+        {
+            APIResponse response = new APIResponse();
+            try
+            {
+                response.StatusCode = 201;
+                response.Message = "Password change is successful";
+                var id = int.Parse(User.FindFirst("id")?.Value);
+                response.Data = await _userService.PasswordChange(id, userpassworddto);
+                return Ok(response);
+            }
+            catch (MandatoryPropertyEmptyException ex)
+            {
+                response.StatusCode = 400;
+                response.Message = ex.Message;
+                return BadRequest(response);
+
+            }
+            catch (InvalidPropertyValueException ex)
+            {
+                response.StatusCode = 400;
+                response.Message = ex.Message;
+                return BadRequest(response);
+            }
+            catch (NotFoundException ex)
+            {
+                response.StatusCode = 404;
+                response.Message = ex.Message;
+                return BadRequest(response);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                response.StatusCode = 401;
+                response.Message = "Unauthorized";
+                return Unauthorized(response);
+            }
+            catch (PasswordsNotMatchException ex)
+            {
+                response.StatusCode = 400;
                 response.Message = ex.Message;
                 return BadRequest(response);
             }

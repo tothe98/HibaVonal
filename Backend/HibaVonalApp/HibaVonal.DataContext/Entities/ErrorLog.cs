@@ -14,9 +14,7 @@ public class ErrorLog
 
     [Required]
     public string Description { get; set; }
-
-    [Required]
-    public string Comment { get; set; }
+    public string? Comment { get; set; }
 
     [Required]
     public EErrorStatus Status { get; set; }

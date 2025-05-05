@@ -3,7 +3,10 @@ using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
 using HibaVonal.Services.Exceptions;
+using HibaVonal.Services.Security;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
 
 namespace HibaVonal.Services.Services
 {
@@ -13,7 +16,8 @@ namespace HibaVonal.Services.Services
         Task<List<UserDataDto>> List();
         Task<UserDataDto> GetById(int id);
         Task<UserDataDto> GetByEmail(string email);
-        Task<UserDataDto> Update(UserUpdateDto user);
+        Task<UserDataDto> Update(int userId, UserUpdateDto user);
+        Task<UserDataDto> PasswordChange(int userId, PasswordChangeDto user);
         Task Delete(int id);
     }
 
@@ -59,9 +63,9 @@ namespace HibaVonal.Services.Services
             }
         }
 
-        public async Task<UserDataDto> Update(UserUpdateDto user)
+        public async Task<UserDataDto> Update(int userId, UserUpdateDto user)
         {
-            User updatingUser = await _context.User.FirstOrDefaultAsync(u => u.Id == user.Id);
+            User updatingUser = await _context.User.FirstOrDefaultAsync(u => u.Id == userId);
             if (updatingUser == null)
             {
                 throw new NotFoundException("User is not found!");
@@ -71,7 +75,35 @@ namespace HibaVonal.Services.Services
             updatingUser.PhoneNumber = user.PhoneNumber;
             updatingUser.PersonalRoomId = user.PersonalRoomId;
             await _context.SaveChangesAsync();
-            var updatedUser = await _context.User.Include(r => r.Roles).ThenInclude(ro => ro.Role).FirstOrDefaultAsync(u => u.Id == user.Id);
+            var updatedUser = await _context.User.Include(r => r.Roles).ThenInclude(ro => ro.Role).FirstOrDefaultAsync(u => u.Id == userId);
+            return _mapper.Map<UserDataDto>(updatedUser);
+        }
+
+        public async Task<UserDataDto> PasswordChange(int userId, PasswordChangeDto passwordChangeDto)
+        {
+            User updatingUser = await _context.User.FirstOrDefaultAsync(u => u.Id == userId);
+            if (updatingUser == null)
+            {
+                throw new NotFoundException("User is not found!");
+            }
+            Encryption enc = Encryption.Initialize(updatingUser.Password);
+            if (enc.Validate(passwordChangeDto.CurrentPassword))
+            {
+                if (passwordChangeDto.NewPassword != passwordChangeDto.NewPasswordConfirm)
+                {
+                    throw new PasswordsNotMatchException();
+                }
+                else
+                {
+                    updatingUser.Password = enc.EncyptPassword(passwordChangeDto.NewPassword);
+                }
+            }
+            else
+            {
+                throw new UnauthorizedAccessException();
+            }
+            await _context.SaveChangesAsync();
+            var updatedUser = await _context.User.Include(r => r.Roles).ThenInclude(ro => ro.Role).FirstOrDefaultAsync(u => u.Id == userId);
             return _mapper.Map<UserDataDto>(updatedUser);
         }
 

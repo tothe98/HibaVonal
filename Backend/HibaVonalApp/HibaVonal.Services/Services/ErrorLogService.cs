@@ -2,6 +2,7 @@
 using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
+using HibaVonal.DataContext.Entities;
 using HibaVonal.Services.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -14,11 +15,9 @@ namespace HibaVonal.Services.Services
 {
     public interface IErrorLogService
     {
-
-
         Task<List<ErrorLogDto>> List();
-        Task<ErrorLogDto> Create(ErrorLogCreateDto errorLogCreateDto);
-        Task<ErrorLogDto> Update(int id, ErrorLogCreateDto errorLogUpdateDto);
+        Task<ErrorLogDto> Create(int userId, ErrorLogCreateDto errorLogCreateDto);
+        Task<ErrorLogDto> Update(int id, ErrorLogUpdateDto errorLogUpdateDto);
         Task Delete(int id);
     }
     public class ErrorLogService : IErrorLogService
@@ -40,19 +39,19 @@ namespace HibaVonal.Services.Services
                 .ToListAsync();
         }
 
-        public async Task<ErrorLogDto> Create(ErrorLogCreateDto errorLogCreateDto)
+        public async Task<ErrorLogDto> Create(int userId, ErrorLogCreateDto errorLogCreateDto)
         {
             var errorlog = _mapper.Map<ErrorLog>(errorLogCreateDto);
-            var reporter = await _context.User.FindAsync(errorLogCreateDto.ReporterId);
+            var reporter = await _context.User.FindAsync(userId);
             if (reporter == null)
             {
                 throw new ReporterWithIdNotExistsException("Reporter not found");
             }
-            var maintenanceWorker = await _context.User.FindAsync(errorLogCreateDto.MaintenanceWorkerId);
+            /*var maintenanceWorker = await _context.User.FindAsync(userId);
             if (maintenanceWorker == null)
             {
                 throw new MaintenanceWorkerWithIdNotExistsException("Maintenance worker not found");
-            }
+            }*/
             var room = await _context.Room.FindAsync(errorLogCreateDto.RoomId);
             if (room == null)
             {
@@ -60,7 +59,8 @@ namespace HibaVonal.Services.Services
             }
 
             errorlog.Reporter = reporter;
-            errorlog.MaintenanceWorker = maintenanceWorker;
+            //errorlog.MaintenanceWorker = maintenanceWorker;
+            errorlog.Status = EErrorStatus.Recieved;
             errorlog.Room = room;
             errorlog.ReportTime = DateTime.Now;
 
@@ -68,7 +68,7 @@ namespace HibaVonal.Services.Services
             await _context.SaveChangesAsync();
             return _mapper.Map<ErrorLogDto>(errorlog);
         }
-        public async Task<ErrorLogDto> Update(int id, ErrorLogCreateDto errorLogUpdateDto)
+        public async Task<ErrorLogDto> Update(int id, ErrorLogUpdateDto errorLogUpdateDto)
         {
             var errorLog = await _context.ErrorLog.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
             if (errorLog == null)
@@ -93,6 +93,7 @@ namespace HibaVonal.Services.Services
             _mapper.Map(errorLogUpdateDto, errorLog);
             errorLog.Reporter = reporter;
             errorLog.MaintenanceWorker = maintenanceWorker;
+            errorLog.Comment = errorLogUpdateDto.Comment;
             errorLog.Room = room;
 
             _context.ErrorLog.Update(errorLog);

@@ -20,6 +20,7 @@ public class RoomController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize]
     public async Task<ActionResult<IEnumerable<RoomDto>>> List()
     {
         return Ok(await _roomService.List());
