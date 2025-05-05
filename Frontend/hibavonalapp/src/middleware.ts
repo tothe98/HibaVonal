@@ -18,6 +18,7 @@ export default async function middleware(req: NextRequest) {
 
     // Redirects to login page when trying to access a protected route
     if (isProtectedRoute && !session?.email) {
+        cookieStore.delete("session")
         return NextResponse.redirect(new URL("/", req.nextUrl))
     }
 

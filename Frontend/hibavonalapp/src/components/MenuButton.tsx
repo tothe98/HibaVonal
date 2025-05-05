@@ -1,8 +1,10 @@
-import { MenuButtonProps } from "@/interfaces/MenuButtonProps"
+interface MenuButtonProps {
+    id: string
+    label?: string
+    onClick: () => void
+}
 
-export default function MenuButton(props: Readonly<{ children: React.ReactNode } & MenuButtonProps>) {
-    const { children, id, label, onClick } = props
-
+export default function MenuButton({ id, label, onClick, children }: MenuButtonProps & Readonly<{ children: React.ReactNode }>) {
     return (
         <button
             id={id ? `menu-button-${id}` : undefined}
