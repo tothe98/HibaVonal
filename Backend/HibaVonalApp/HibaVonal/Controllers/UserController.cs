@@ -1,4 +1,5 @@
-﻿using HibaVonal.DataContext.Dtos;
+﻿using Hibavonal.DataContext.Entities;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
 using HibaVonal.Services.Exceptions;
 using HibaVonal.Services.Services;
@@ -72,14 +73,14 @@ namespace HibaVonal.Controllers
                 {
                     throw new NotFoundException("User not found");
                 }
-
                 response.StatusCode = 200;
                 response.Data = new
                 {
                     id,
                     name = user.Name,
                     email = user.Email,
-                    roles = user.Roles
+                    roles = user.Roles,
+                    roomId = user.PersonalRoomId
                 };
                 return Ok(response);
             }
@@ -150,6 +151,11 @@ namespace HibaVonal.Controllers
                 return BadRequest(response);
             }
             catch (InvalidEmailDomainException ex)
+            {
+                response.StatusCode = 400;
+                response.Message = ex.Message;
+                return BadRequest(response);
+            }catch(EmailUsedException ex)
             {
                 response.StatusCode = 400;
                 response.Message = ex.Message;

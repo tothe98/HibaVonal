@@ -43,8 +43,8 @@ public class AutoMapperProfile : Profile
         CreateMap<ErrorLog, ErrorLogDto>().ReverseMap();
         CreateMap<ErrorLog, ErrorLogCreateDto>().ReverseMap();
 
-
         CreateMap<User, UserDataDto>().ReverseMap();
+        
         CreateMap<User, UserUpdateDto>().ReverseMap();
         CreateMap<UserRole, UserRoleDto>()
             .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.Name));

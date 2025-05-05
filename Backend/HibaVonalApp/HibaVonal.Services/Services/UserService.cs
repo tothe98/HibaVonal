@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
 using HibaVonal.DataContext.Entities;
@@ -40,7 +41,7 @@ namespace HibaVonal.Services.Services
         {
             User user = await _context.User.Include(u=>u.Roles).ThenInclude(r=>r.Role).FirstOrDefaultAsync(u => u.Id == id);
             if (user != null)
-            {
+            { 
                 return _mapper.Map<UserDataDto>(user);
             }
             else
@@ -55,7 +56,6 @@ namespace HibaVonal.Services.Services
             if (user != null)
             {
                 return _mapper.Map<UserDataDto>(user);
-
             }
             else
             {
@@ -69,6 +69,10 @@ namespace HibaVonal.Services.Services
             if (updatingUser == null)
             {
                 throw new NotFoundException("User is not found!");
+            }
+            if (_context.User.Any(u => u.Email == user.Email && updatingUser.Id!=u.Id))
+            {
+                throw new EmailUsedException();
             }
             updatingUser.Name = user.Name;
             updatingUser.Email = user.Email;
