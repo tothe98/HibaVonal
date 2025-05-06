@@ -60,7 +60,6 @@ export default function ReportIssueClientPage({ user }: Props) {
         setError(null)
         setIsSubmitting(true)
 
-        // Validation
         if (!formData.description) {
             setError('Description is required.')
             setIsSubmitting(false)
@@ -131,8 +130,8 @@ export default function ReportIssueClientPage({ user }: Props) {
                     />
                 </div>
                 <div className="mb-4">
-                    <label className="block ml-1 mb-2 text-md text-gray-700">Level</label>
-                    <div className="flex justify-center gap-2">
+                    <label htmlFor="level" className="block ml-1 mb-2 text-md text-gray-700">Level</label>
+                    <div className="hidden sm:flex justify-center gap-2">
                         {['Low', 'Medium', 'High', 'Critical'].map((label, i) => (
                             <Button
                                 key={label}
@@ -147,7 +146,24 @@ export default function ReportIssueClientPage({ user }: Props) {
                             </Button>
                         ))}
                     </div>
+
+                    {/* dropdown if sm screen*/}
+                    <div className="sm:hidden">
+                        <select
+                            id="level"
+                            name="level"
+                            value={formData.level}
+                            onChange={(e) => handleLevelChange(parseInt(e.target.value))}
+                            className="w-full py-2 px-3 h-14 rounded-md border-2 border-gray-500 hover:border-cyan-500 focus:border-cyan-500 focus:outline-none"
+                        >
+                            <option value={0}>Low</option>
+                            <option value={1}>Medium</option>
+                            <option value={2}>High</option>
+                            <option value={3}>Critical</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div className="mb-8">
                     <InputField
                         name="roomId"

@@ -145,7 +145,7 @@ export default function IssuesClientPage({ user }: IssuesClientProps) {
                 <h1 className="text-2xl font-semibold">Issues</h1>
                 <Button
                     type="button"
-                    onClick={() => router.push('/report-issue')}
+                    onClick={() => router.push('/dashboard/report-issue')}
                     className="px-4 py-2"
                 >
                     Report Issue
