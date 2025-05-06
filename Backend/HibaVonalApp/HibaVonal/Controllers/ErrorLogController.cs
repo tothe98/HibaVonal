@@ -32,6 +32,14 @@ namespace HibaVonal.Controllers
             return await _errorLogService.List();
         }
 
+        [HttpGet]
+        [Authorize]
+        public async Task<ActionResult<List<ErrorLogDto>>> ListCurrent()
+        {
+            var userId = int.Parse(User.FindFirst("id")?.Value);
+            return await _errorLogService.ListCurrent(userId);
+        }
+
         [HttpPost]
         [Authorize("User")]
         public async Task<ActionResult<ErrorLogDto>> Create([FromBody] ErrorLogCreateDto errorLogCreateDto)

@@ -79,6 +79,7 @@ namespace HibaVonal.Controllers
                     id,
                     name = user.Name,
                     email = user.Email,
+                    phoneNumber = user.PhoneNumber,
                     roles = user.Roles,
                     roomId = user.PersonalRoomId
                 };
