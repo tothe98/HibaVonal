@@ -3,9 +3,9 @@
 import { cookies } from 'next/headers'
 
 interface ReportIssueFormData {
-    description: string;
-    roomNumber: string;
+    description: string
     level: number
+    roomId: number
 }
 
 interface APIResponse<T> {
@@ -14,7 +14,7 @@ interface APIResponse<T> {
     data: T | null
 }
 
-export async function listRooms() {
+export async function reportIssue(formData: ReportIssueFormData) {
     const cookieStore = await cookies()
     const token = cookieStore.get('session')?.value
 
@@ -23,22 +23,21 @@ export async function listRooms() {
     }
 
     try {
-        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/Room/List`, {
-            method: 'GET',
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/ErrorLogs/Create`, {
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`,
             },
+            body: JSON.stringify(formData),
         })
 
-        const json: APIResponse<ReportIssueFormData> = await response.json()
+        const json: APIResponse<null> = await response.json()
         if (!response.ok || json.statusCode !== 200) {
-            return { success: false, error: json.message || 'Failed to update profile.' }
+            return { success: false, error: json.message || 'Failed to report issue.' }
         }
 
-        console.log(json);
-        console.log(response);
-        return { json, success: true, error: null }
+        return { success: true, error: null }
     } catch (error) {
         return { success: false, error: error instanceof Error ? error.message : 'An error occurred.' }
     }

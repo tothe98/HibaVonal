@@ -7,9 +7,11 @@ interface InputFieldProps {
     type: string
     onChange?: ChangeEventHandler<HTMLInputElement>
     required?: boolean
+    min?: number
+    max?: number
 }
 
-export default function InputField({ name, placeholder, label, type, onChange, required }: InputFieldProps) {
+export default function InputField({ name, placeholder, label, type, onChange, required, min, max }: InputFieldProps) {
     const inputId = name ? `input-field-${name}` : undefined
 
     return (
@@ -27,6 +29,8 @@ export default function InputField({ name, placeholder, label, type, onChange, r
                 id={inputId}
                 onChange={onChange}
                 required={required}
+                min={min}
+                max={max}
             />
         </>
     )

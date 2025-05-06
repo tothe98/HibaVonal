@@ -1,21 +1,10 @@
 "use client"
 
-import { useState, ChangeEventHandler } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import InputField from '@/components/InputField'
 import Button from '@/components/Button'
-
-interface ReportIssueFormData {
-    description: string
-    roomNumber: string
-    level: number
-}
-
-interface APIResponse<T> {
-    statusCode: number
-    message: string | null
-    data: T | null
-}
+import { reportIssue } from './actions'
 
 interface Role {
     roleId: number
@@ -27,35 +16,43 @@ interface User {
     name: string
     email: string
     phoneNumber: string
-    isDeleted: boolean
     roles: Role[]
+}
+
+interface ReportIssueFormData {
+    description: string
+    level: number
+    roomId: number
 }
 
 interface Props {
     user: User
-}
-
-interface InputFieldProps {
-    name: string
-    placeholder?: string
-    label?: string
-    type: string
-    onChange?: ChangeEventHandler<HTMLInputElement>
+    isAuthenticated: boolean
 }
 
 export default function ReportIssueClientPage({ user }: Props) {
     const router = useRouter()
     const [formData, setFormData] = useState<ReportIssueFormData>({
         description: '',
-        roomNumber: '',
-        level: 0
+        level: 0,
+        roomId: 0,
     })
     const [error, setError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
+        setFormData((prev) => ({
+            ...prev,
+            [name]: name === 'level' || name === 'roomId' ? parseInt(value) || 0 : value,
+        }))
+    }
+
+    const handleLevelChange = (level: number) => {
+        setFormData((prev) => ({
+            ...prev,
+            level,
+        }))
     }
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -63,58 +60,108 @@ export default function ReportIssueClientPage({ user }: Props) {
         setError(null)
         setIsSubmitting(true)
 
-        if (!formData.description || !formData.roomNumber || formData.level == 0) {
-            setError('All fields are required.')
+        // Validation
+        if (!formData.description) {
+            setError('Description is required.')
             setIsSubmitting(false)
             return null
         }
 
+        if (formData.level < 0 || formData.level > 3) {
+            setError('Please select a valid level.')
+            setIsSubmitting(false)
+            return null
+        }
+
+        if (formData.roomId <= 0) {
+            setError('Room ID must be a positive number.')
+            setIsSubmitting(false)
+            return null
+        }
+
+        const result = await reportIssue({
+            description: formData.description,
+            level: formData.level,
+            roomId: formData.roomId,
+        })
+
+        setIsSubmitting(false)
+
+        if (!result.success) {
+            setError(result.error)
+            return null
+        }
+
+        router.push('/dashboard/issues')
     }
+
+    const levelStyles = [
+        'bg-err-low hover:bg-err-low-h',
+        'bg-err-medium hover:bg-err-medium-h',
+        'bg-err-high hover:bg-err-high-h',
+        'bg-err-critical hover:bg-err-critical-h',
+    ]
 
     return (
         <main
             className={`
-                w-full sm:max-w-md max-w-xs p-4 sm:p-6 mb-4
+                w-full my-4 sm:max-w-md max-w-xs p-4 sm:p-6
                 bg-white rounded-xl shadow-2xl shadow-gray-600
                 flex flex-col items-center
-          `}
+            `}
         >
-            <h1 className="text-2xl font-semibold mb-4">Report an Issue</h1>
-            {error && <p className="text-red-500 mb-4">{error}</p>}
+            <h1 className="text-2xl font-semibold mb-4">Report Issue</h1>
+            <div className="h-8">
+                {error && <p className="text-red-500 mb-4">{error}</p>}
+            </div>
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-4">
-                    <label htmlFor="description" className="block ml-1 mb-2 text-md text-gray-700">
-                        Description
-                    </label>
+                    <label htmlFor="description" className="block ml-1 mb-2 text-md text-gray-700">Description</label>
                     <textarea
-                        id="description"
                         name="description"
-                        value={formData.description}
-                        onChange={handleChange}
+                        id="description"
+                        placeholder="Enter issue description"
                         className={`
-                            w-full min-w-64 min-h-10 py-4 px-3 rounded-md border-2 leading-tight
+                            w-full min-w-64 py-4 px-3 rounded-md border-2 leading-tight
                             border-gray-500 hover:border-cyan-500 focus:border-cyan-500 text-base text-gray-900 placeholder:text-gray-500
                             focus:outline-none appearance-none
                         `}
-                        placeholder="Describe the issue"
+                        onChange={handleChange}
                         rows={4}
-                        required
                     />
                 </div>
                 <div className="mb-4">
+                    <label className="block ml-1 mb-2 text-md text-gray-700">Level</label>
+                    <div className="flex justify-center gap-2">
+                        {['Low', 'Medium', 'High', 'Critical'].map((label, i) => (
+                            <Button
+                                key={label}
+                                type="button"
+                                onClick={() => handleLevelChange(i)}
+                                className={`
+                                    flex-1 px-4 py-2 rounded-md text-sm text-white
+                                    ${formData.level === i ? levelStyles[i] : 'bg-gray-300 text-gray-700 hover:bg-gray-400'}
+                                `}
+                            >
+                                {label}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
+                <div className="mb-8">
                     <InputField
-                        name="roomNumber"
-                        label="Room Number"
-                        type="text"
-                        placeholder="Enter room number"
+                        name="roomId"
+                        label="Room ID"
+                        type="number"
+                        placeholder="Enter room ID"
                         onChange={handleChange}
-                        required
+                        min={1}
                     />
                 </div>
                 <div className="flex justify-end gap-2">
                     <Button
                         type="button"
-                        onClick={() => router.back()}
+                        onClick={() => router.push('/dashboard')}
                         className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400"
                         disabled={isSubmitting}
                     >
@@ -122,7 +169,7 @@ export default function ReportIssueClientPage({ user }: Props) {
                     </Button>
                     <Button
                         type="submit"
-                        className="px-4 py-2"
+                        className="px-6 py-2"
                         disabled={isSubmitting}
                     >
                         {isSubmitting ? 'Submitting...' : 'Submit'}

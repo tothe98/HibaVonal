@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import InputField from '@/components/InputField'
-import { updateProfile } from './actions'
 import Button from '@/components/Button'
+import { updateProfile, updatePassword } from './actions'
 
 interface Role {
     roleId: number
@@ -12,22 +12,37 @@ interface Role {
 }
 
 interface User {
+    id: number
     name: string
     email: string
     phoneNumber: string
-    personalRoomId: number
     roles: Role[]
+}
+
+interface ProfileFormData {
+    name: string
+    email: string
+    phoneNumber: string
+}
+
+interface PasswordFormData {
+    currentPassword: string
+    newPassword: string
+    newPasswordConfirm: string
 }
 
 interface EditProfileFormData {
     name: string
     email: string
     phoneNumber: string
-    personalRoomId: number
+    currentPassword: string
+    newPassword: string
+    newPasswordConfirm: string
 }
 
 interface Props {
     user: User
+    isAuthenticated: boolean
 }
 
 export default function EditProfileClientPage({ user }: Props) {
@@ -36,9 +51,12 @@ export default function EditProfileClientPage({ user }: Props) {
         name: user.name,
         email: user.email,
         phoneNumber: user.phoneNumber,
-        personalRoomId: user.personalRoomId
+        currentPassword: '',
+        newPassword: '',
+        newPasswordConfirm: '',
     })
-    const [error, setError] = useState<string | null>(null)
+    const [profileError, setProfileError] = useState<string | null>(null)
+    const [passwordError, setPasswordError] = useState<string | null>(null)
     const [isSubmitting, setIsSubmitting] = useState(false)
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,53 +67,114 @@ export default function EditProfileClientPage({ user }: Props) {
         }))
     }
 
+    const hasProfileChanges = () => {
+        return (
+            formData.name !== user.name ||
+            formData.email !== user.email ||
+            formData.phoneNumber !== user.phoneNumber
+        )
+    }
+
+    const hasPasswordChanges = () => {
+        return (
+            formData.currentPassword !== '' &&
+            formData.newPassword !== '' &&
+            formData.newPasswordConfirm !== ''
+        )
+    }
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setError(null)
+        setProfileError(null)
+        setPasswordError(null)
         setIsSubmitting(true)
 
-        if (!formData.name) {
-            setError('Name is required.')
+        // Profile validation
+        let profileValid = true
+        if (hasProfileChanges()) {
+            if (!formData.name) {
+                setProfileError('Name is required.')
+                profileValid = false
+            }
+
+            if (!formData.email) {
+                setProfileError('Email is required.')
+                profileValid = false
+            }
+        }
+
+        // Password validation
+        let passwordValid = true
+        if (hasPasswordChanges()) {
+            if (!formData.currentPassword) {
+                setPasswordError('Current password is required.')
+                passwordValid = false
+            }
+
+            if (formData.newPassword.length < 8) {
+                setPasswordError('New password must be at least 8 characters.')
+                passwordValid = false
+            }
+
+            if (formData.newPassword !== formData.newPasswordConfirm) {
+                setPasswordError('New passwords do not match.')
+                passwordValid = false
+            }
+        }
+
+        if (!profileValid || !passwordValid) {
             setIsSubmitting(false)
             return null
         }
 
-        if (!formData.email) {
-            setError('Email is required.')
-            setIsSubmitting(false)
-            return null
+        let profileSuccess = true
+        let passwordSuccess = true
+
+        if (hasProfileChanges()) {
+            const profileResult = await updateProfile({
+                name: formData.name,
+                email: formData.email,
+                phoneNumber: formData.phoneNumber,
+            } as ProfileFormData)
+            if (!profileResult.success) {
+                setProfileError(profileResult.error)
+                profileSuccess = false
+            }
         }
 
-        if (!formData.phoneNumber) {
-            setError('Phone number is required.')
-            setIsSubmitting(false)
-            return null
-        }
-
-        const result = await updateProfile(formData)
-        if (!result.success) {
-            setError(result.error)
-            setIsSubmitting(false)
-            return null
+        if (hasPasswordChanges()) {
+            const passwordResult = await updatePassword({
+                currentPassword: formData.currentPassword,
+                newPassword: formData.newPassword,
+                newPasswordConfirm: formData.newPasswordConfirm,
+            } as PasswordFormData)
+            if (!passwordResult.success) {
+                setPasswordError(passwordResult.error)
+                passwordSuccess = false
+            }
         }
 
         setIsSubmitting(false)
-        location.reload()
+
+        if (profileSuccess && passwordSuccess && (hasProfileChanges() || hasPasswordChanges())) {
+            location.reload()
+        }
     }
 
     return (
         <main
             className={`
-            w-full mt-4 sm:max-w-md max-w-xs p-4 sm:p-6 mb-4
-            bg-white rounded-xl shadow-2xl shadow-gray-600
-            flex flex-col items-center
-        `}
+                w-full my-4 sm:max-w-md max-w-xs p-4 sm:p-6
+                bg-white rounded-xl shadow-2xl shadow-gray-600
+                flex flex-col items-center
+            `}
         >
             <h1 className="text-2xl font-semibold mb-4">Edit Profile</h1>
-            <div className="h-6">
-                {error && <p className="text-red-500 mb-4">{error}</p>}
+            <div className="h-8">
+                {profileError && <p className="text-red-500 mb-4">{profileError}</p>}
             </div>
             <form onSubmit={handleSubmit} className="w-full">
+                <h2 className="text-xl font-semibold mb-4">Profile data</h2>
                 <div className="mb-4">
                     <InputField
                         name="name"
@@ -120,6 +199,37 @@ export default function EditProfileClientPage({ user }: Props) {
                         label="Phone Number"
                         type="text"
                         placeholder={formData.phoneNumber}
+                        onChange={handleChange}
+                    />
+                </div>
+                <h2 className="text-xl font-semibold mb-4">Password</h2>
+                <div className="h-8">
+                    {passwordError && <p className="text-red-500 mb-4">{passwordError}</p>}
+                </div>
+                <div className="mb-4">
+                    <InputField
+                        name="currentPassword"
+                        label="Current Password"
+                        type="password"
+                        placeholder="Enter current password"
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="mb-4">
+                    <InputField
+                        name="newPassword"
+                        label="New Password"
+                        type="password"
+                        placeholder="Enter new password"
+                        onChange={handleChange}
+                    />
+                </div>
+                <div className="mb-8">
+                    <InputField
+                        name="confirmNewPassword"
+                        label="Confirm New Password"
+                        type="password"
+                        placeholder="Confirm new password"
                         onChange={handleChange}
                     />
                 </div>

@@ -85,7 +85,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
     if (roles.some(role => role.roleId === ROLE_ADMIN)) {
         buttons = [...adminButtons]
     }
-    if (roles.some(role => role.roleId === ROLE_USER)) {
+    if (roles.some(role => role.roleId === ROLE_USER || role.roleId === ROLE_ADMIN)) {
         buttons = [...buttons, ...userButtons]
     }
 
@@ -93,7 +93,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
         <>
             <main
                 className={`
-                    w-full sm:max-w-md max-w-xs p-4 sm:p-6 mb-4
+                    w-full my-4 sm:max-w-md max-w-xs p-4 sm:p-6
                     bg-white rounded-xl shadow-2xl shadow-gray-600
                     grid grid-cols-1 gap-2 items-center
                     sm:gap-4 sm:grid-cols-2
