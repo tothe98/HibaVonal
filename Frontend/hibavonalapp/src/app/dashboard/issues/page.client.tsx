@@ -30,12 +30,11 @@ interface Issue {
     }
 }
 
-interface IssuesClientProps {
+interface Props {
     user: User
-    isAuthenticated: boolean
 }
 
-export default function IssuesClientPage({ user }: IssuesClientProps) {
+export default function IssuesClientPage({ user }: Props) {
     const router = useRouter()
     const [issues, setIssues] = useState<Issue[]>([])
     const [error, setError] = useState<string | null>(null)

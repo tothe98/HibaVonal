@@ -2,13 +2,6 @@ import "server-only"
 import { jwtVerify } from "jose"
 import { cookies } from "next/headers"
 
-interface SessionPayloadProps {
-    id: string
-    name: string
-    email: string
-    expiresAt: Date
-}
-
 const secretKey = process.env.SESSION_SECRET
 const encodedKey = new TextEncoder().encode(secretKey)
 
