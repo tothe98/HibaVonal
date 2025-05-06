@@ -44,6 +44,8 @@ public class AutoMapperProfile : Profile
         CreateMap<ErrorLog, ErrorLogCreateDto>().ReverseMap();
         CreateMap<ErrorLog, ErrorLogUpdateDto>().ReverseMap();
 
+        CreateMap<Role, RoleDto>().ReverseMap();
+
         CreateMap<User, UserDataDto>().ReverseMap();
         CreateMap<User, UserUpdateDto>().ReverseMap();
         CreateMap<UserRole, UserRoleDto>()

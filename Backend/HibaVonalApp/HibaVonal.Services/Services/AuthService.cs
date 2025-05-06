@@ -14,6 +14,7 @@ namespace HibaVonal.Services.Services
     {
         Task<AccessTokenDto> Login(LoginDto login);
         Task<UserDataDto> Registration(RegisterDto regiser);
+        Task<List<RoleDto>> ListRoles();
         bool ValidateToken(string token);
 
     }
@@ -87,14 +88,22 @@ namespace HibaVonal.Services.Services
                         Email = regiser.Email,
                         Name = regiser.Name,
                         Password = enc.EncyptPassword(regiser.Password),
-                        PhoneNumber = regiser.PhoneNumber,
+                        PhoneNumber = regiser.PhoneNumber
                     };
+                    if (regiser.RoomId != null)
+                    {
+                        if (!_context.Room.OfType<PersonalRoom>().Any(r => r.Id == regiser.RoomId))
+                        {
+                            throw new RoomWithIdNotExistsException();
+                        }
+                        user.PersonalRoomId = regiser.RoomId;
+                    }
 
                     _context.User.Add(user);
                     await _context.SaveChangesAsync();
                     //Ezt lehetne szebben is megoldani
                     int userId = _context.User.First(u => u.Email == user.Email).Id;
-                    UserRole userRole = new UserRole() { RoleId = 4, UserId = userId };
+                    UserRole userRole = new UserRole() { RoleId = regiser.RoleId, UserId = userId };
                     _context.UserRole.Add(userRole);
                     await _context.SaveChangesAsync();
 
@@ -102,6 +111,11 @@ namespace HibaVonal.Services.Services
                 }
             }
 
+        }
+
+        public async Task<List<RoleDto>> ListRoles()
+        {
+            return await _context.Role.Select(e => _mapper.Map<RoleDto>(e)).ToListAsync();
         }
 
         public bool ValidateToken(string token)

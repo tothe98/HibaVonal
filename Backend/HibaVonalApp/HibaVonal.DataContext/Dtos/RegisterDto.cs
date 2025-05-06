@@ -12,7 +12,7 @@ namespace HibaVonal.DataContext.Dtos
 
         [Required]
         public string Name { get; set; }
-        [Required, EmailAddress]
+        [Required, EmailAddress(ErrorMessage = "The email address is not valid")]
         public string Email { get; set; }
         [Required]
         public string Password { get; set; }
@@ -20,6 +20,9 @@ namespace HibaVonal.DataContext.Dtos
         public string PasswordConfirm { get; set; }
         [Required]
         public string PhoneNumber { get; set; }
+        [Required]
+        public int RoleId { get; set; }
+        public int? RoomId { get; set; }
 
     }
 }
