@@ -27,7 +27,6 @@ interface ReportIssueFormData {
 
 interface Props {
     user: User
-    isAuthenticated: boolean
 }
 
 export default function ReportIssueClientPage({ user }: Props) {

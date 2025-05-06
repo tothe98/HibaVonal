@@ -42,7 +42,6 @@ interface EditProfileFormData {
 
 interface Props {
     user: User
-    isAuthenticated: boolean
 }
 
 export default function EditProfileClientPage({ user }: Props) {

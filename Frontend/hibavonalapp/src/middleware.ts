@@ -4,8 +4,9 @@ import { decrypt } from "./lib/session"
 
 const protectedRoutes = ["/dashboard"]
 const adminRoutes = ["/dashboard/errortypes", "/dashboard/errortype-create"]
-const workerRoutes = ["/dashboard/assigned-issues", "/dashboard/work-orders"]
 const managerRoutes = ["/dashboard/reports"]
+const workerRoutes = ["/dashboard/assigned-issues", "/dashboard/work-orders"]
+const userRoutes = ["/dashboard/report-issue", "/dashboard/issues"]
 const publicRoutes = ["/"]
 
 export default async function middleware(req: NextRequest) {
@@ -13,8 +14,9 @@ export default async function middleware(req: NextRequest) {
 
     const isProtectedRoute = protectedRoutes.some((route) => path.startsWith(route))
     const isAdminRoute = adminRoutes.some((route) => path.startsWith(route))
-    const isWorkerRoute = workerRoutes.some((route) => path.startsWith(route))
     const isManagerRoute = managerRoutes.some((route) => path.startsWith(route))
+    const isWorkerRoute = workerRoutes.some((route) => path.startsWith(route))
+    const isUserRoute = userRoutes.some((route) => path.startsWith(route))
     const isPublicRoute = publicRoutes.includes(path)
 
     const cookieStore = await cookies()
@@ -34,7 +36,7 @@ export default async function middleware(req: NextRequest) {
         return NextResponse.redirect(new URL("/", req.nextUrl))
     }
 
-    if (isAdminRoute || isWorkerRoute || isManagerRoute) {
+    if (isAdminRoute || isWorkerRoute || isManagerRoute || isUserRoute) {
 
         // Admin routes
         if (isAdminRoute && session?.role === '1') {
@@ -48,6 +50,11 @@ export default async function middleware(req: NextRequest) {
 
         // Worker routes
         if (isWorkerRoute && session?.role === '3') {
+            return NextResponse.next()
+        }
+
+        // User routes
+        if (isUserRoute && session?.role === '4') {
             return NextResponse.next()
         }
 
