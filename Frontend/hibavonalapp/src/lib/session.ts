@@ -63,13 +63,18 @@ interface APIResponse<T> {
     data: T | null
 }
 
+interface Role {
+    roleId: number;
+    name: string;
+}
+
 interface User {
     id: string
     name: string
     email: string
     phoneNumber: string
     personalRoomId: number
-    roles: number[]
+    roles: Role[]
 }
 
 export async function fetchCurrentUser(token: string): Promise<User | null> {
