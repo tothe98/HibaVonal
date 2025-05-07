@@ -33,6 +33,14 @@ namespace HibaVonal.Controllers
         }
 
         [HttpGet]
+        [Authorize("MaintenanceWorker")]
+        public async Task<ActionResult<List<ErrorLogDto>>> ListCurrentAssigned()
+        {
+            var workerId = int.Parse(User.FindFirst("id")?.Value);
+            return await _errorLogService.ListCurrentAssigned(workerId);
+        }
+
+        [HttpGet]
         [Authorize]
         public async Task<ActionResult<List<ErrorLogDto>>> ListCurrent()
         {

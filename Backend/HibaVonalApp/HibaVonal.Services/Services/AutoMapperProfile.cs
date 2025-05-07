@@ -34,7 +34,8 @@ public class AutoMapperProfile : Profile
         CreateMap<OrderItem, OrderItemDto>().ReverseMap();
         CreateMap<OrderItemCreateDto, OrderItem>();
 
-        CreateMap<Room , RoomDto2>().ReverseMap();
+        // Ez igy mi?
+        // CreateMap<Room , RoomDto2>().ReverseMap();
         CreateMap<Room, RoomDto>()
             .Include<SharedRoom, SharedRoomDto>()
             .Include<PersonalRoom, PersonalRoomDto>();

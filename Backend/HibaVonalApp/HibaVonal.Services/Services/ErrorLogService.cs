@@ -17,6 +17,7 @@ namespace HibaVonal.Services.Services
     {
         Task<List<ErrorLogDto>> List();
         Task<List<ErrorLogDto>> ListCurrent(int userId);
+        Task<List<ErrorLogDto>> ListCurrentAssigned(int workerId);
         Task<ErrorLogDto> Create(int userId, ErrorLogCreateDto errorLogCreateDto);
         Task<ErrorLogDto> Update(int id, ErrorLogUpdateDto errorLogUpdateDto);
         Task Delete(int id);
@@ -34,6 +35,17 @@ namespace HibaVonal.Services.Services
         public async Task<List<ErrorLogDto>> List()
         {
             return await _context.ErrorLog
+                .Include(e => e.Room)
+                .Include(e => e.MaintenanceWorker)
+                .Include(e => e.Reporter)
+                .Select(e => _mapper.Map<ErrorLogDto>(e))
+                .ToListAsync();
+        }
+
+        public async Task<List<ErrorLogDto>> ListCurrentAssigned(int workerId)
+        {
+            return await _context.ErrorLog
+                .Where(e => e.MaintenanceWorkerId == workerId)
                 .Include(e => e.Room)
                 .Include(e => e.MaintenanceWorker)
                 .Include(e => e.Reporter)
