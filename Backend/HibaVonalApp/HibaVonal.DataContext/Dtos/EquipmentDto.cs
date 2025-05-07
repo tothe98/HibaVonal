@@ -15,13 +15,12 @@ public class EquipmentDto
 public class EquipmentCreateDto
 {
     public string Name { get; set; }
-    public int ErrorTypeId { get; set; }
-
+    //public int ErrorTypeId { get; set; }
 }
 
 public class EquipmentUpdateDto
 {
     public string Name { get; set; }
 
-    public int ErrorTypeId { get; set; }
+    public int? ErrorTypeId { get; set; }
 }

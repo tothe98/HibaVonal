@@ -40,4 +40,10 @@ namespace HibaVonal.DataContext.Dtos
         public int? MaintenanceWorkerId { get; set; }
         public int? ReporterId { get; set; }
     }
+
+    public class ErrorLogReporterUpdateDto
+    {
+        public string Description { get; set; }
+        public EErrorLevel Level { get; set; }
+    }
 }

@@ -34,8 +34,8 @@ public class AutoMapperProfile : Profile
         CreateMap<OrderItem, OrderItemDto>().ReverseMap();
         CreateMap<OrderItemCreateDto, OrderItem>();
 
-        // Ez igy mi?
-        // CreateMap<Room , RoomDto2>().ReverseMap();
+        //Kell ez ide egy�ltal�n
+        //CreateMap<Room , RoomDto>().ReverseMap();
         CreateMap<Room, RoomDto>()
             .Include<SharedRoom, SharedRoomDto>()
             .Include<PersonalRoom, PersonalRoomDto>();
@@ -46,10 +46,10 @@ public class AutoMapperProfile : Profile
         CreateMap<PersonalRoom, PersonalRoomCreateDto>().ReverseMap();
         CreateMap<SharedRoom, SharedRoomCreateDto>().ReverseMap();
 
-
         CreateMap<ErrorLog, ErrorLogDto>().ReverseMap();
         CreateMap<ErrorLog, ErrorLogCreateDto>().ReverseMap();
         CreateMap<ErrorLog, ErrorLogUpdateDto>().ReverseMap();
+        CreateMap<ErrorLog, ErrorLogReporterUpdateDto>().ReverseMap();
 
         CreateMap<Role, RoleDto>().ReverseMap();
 

@@ -11,6 +11,7 @@ using HibaVonal.DataContext.Dtos;
 using LibraryCommon.Models;
 using HibaVonal.Services.Exceptions;
 using Microsoft.AspNetCore.Authorization;
+using HibaVonal.DataContext.Migrations;
 
 namespace HibaVonal.Controllers
 {
@@ -30,6 +31,13 @@ namespace HibaVonal.Controllers
         public async Task<ActionResult<List<ErrorLogDto>>> List()
         {
             return await _errorLogService.List();
+        }
+
+        [HttpGet("id")]
+        [Authorize("User")]
+        public async Task<ActionResult<ErrorLogDto>> Get(int id)
+        {
+            return await _errorLogService.Get(id);
         }
 
         [HttpGet]
@@ -105,6 +113,33 @@ namespace HibaVonal.Controllers
                 response.Message = ex.Message;
             }
             catch (MaintenanceWorkerWithIdNotExistsException ex)
+            {
+                response.StatusCode = 202;
+                response.Message = ex.Message;
+            }
+            catch (Exception ex)
+            {
+                response.StatusCode = 500;
+                response.Message = ex.InnerException?.Message;
+            }
+
+            return BadRequest(response);
+        }
+
+        [HttpPut("{id}")]
+        [Authorize("User")]
+        public async Task<ActionResult<APIResponse>> UserUpdate(int id, [FromBody] ErrorLogReporterUpdateDto errorLogUpdateDto)
+        {
+            APIResponse response = new APIResponse();
+            try
+            {
+                var result = await _errorLogService.UserUpdate(id, errorLogUpdateDto);
+                response.Data = result;
+                response.StatusCode = 200;
+                response.Message = "Error log updated successfully.";
+                return Ok(response);
+            }
+            catch (ErrorLogWithIdNotExistsException ex) 
             {
                 response.StatusCode = 202;
                 response.Message = ex.Message;

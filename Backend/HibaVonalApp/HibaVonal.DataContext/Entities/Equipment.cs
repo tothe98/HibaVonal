@@ -12,7 +12,7 @@ public class Equipment
     [Required]
     public string Name { get; set; }
 
-    public int? ErrorTypeId { get; set; }
+    public int? ErrorTypeId { get; set; } = null;
     [ForeignKey("ErrorTypeId")]
     public ErrorType? ErrorType { get; set; }
 

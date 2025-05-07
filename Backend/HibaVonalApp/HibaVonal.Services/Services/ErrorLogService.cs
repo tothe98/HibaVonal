@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using Hibavonal.DataContext.Entities;
 using HibaVonal.DataContext;
 using HibaVonal.DataContext.Dtos;
@@ -16,10 +16,13 @@ namespace HibaVonal.Services.Services
     public interface IErrorLogService
     {
         Task<List<ErrorLogDto>> List();
+        Task<ErrorLogDto> Get(int id);
         Task<List<ErrorLogDto>> ListCurrent(int userId);
         Task<List<ErrorLogDto>> ListCurrentAssigned(int workerId);
         Task<ErrorLogDto> Create(int userId, ErrorLogCreateDto errorLogCreateDto);
         Task<ErrorLogDto> Update(int id, ErrorLogUpdateDto errorLogUpdateDto);
+        Task<ErrorLogDto> UserUpdate(int id, ErrorLogReporterUpdateDto errorLogUpdateDto);
+
         Task Delete(int id);
     }
     public class ErrorLogService : IErrorLogService
@@ -40,6 +43,17 @@ namespace HibaVonal.Services.Services
                 .Include(e => e.Reporter)
                 .Select(e => _mapper.Map<ErrorLogDto>(e))
                 .ToListAsync();
+        }
+
+        public async Task<ErrorLogDto> Get(int id)
+        {
+            var errorlog = await _context.ErrorLog
+                .Include(e => e.Room)
+                .Include(e => e.MaintenanceWorker)
+                .Include(e => e.Reporter)
+                .FirstOrDefaultAsync(e=>e.Id==id);
+            return _mapper.Map<ErrorLogDto>(errorlog);
+
         }
 
         public async Task<List<ErrorLogDto>> ListCurrentAssigned(int workerId)
@@ -158,6 +172,19 @@ namespace HibaVonal.Services.Services
             return _mapper.Map<ErrorLogDto>(errorLog);
         }
 
+        public async Task<ErrorLogDto> UserUpdate(int id, ErrorLogReporterUpdateDto errorLogUpdateDto )
+        {
+            var errorLog = await _context.ErrorLog.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            if (errorLog == null)
+            {
+                throw new ErrorLogWithIdNotExistsException("Error log not found");
+            }
+            _mapper.Map(errorLogUpdateDto, errorLog);
+
+            _context.ErrorLog.Update(errorLog);
+            await _context.SaveChangesAsync();
+            return _mapper.Map<ErrorLogDto>(errorLog);
+        }
 
         public async Task Delete(int id)
         {

@@ -36,10 +36,10 @@ public class EquipmentService : IEquipmentService
         {
             throw new EquipmentAlreadyExistsException();
         }
-        if (!_context.ErrorType.Any(e => e.Id == equipment.ErrorTypeId))
+        /*if (!_context.ErrorType.Any(e => e.Id == equipment.ErrorTypeId))
         {
             throw new ErrorTypeWithIdNotExistsException();
-        }
+        }*/
         var result = await _context.Equipment.AddAsync(_mapper.Map<Equipment>(equipment));
         await _context.SaveChangesAsync();
 
@@ -52,11 +52,16 @@ public class EquipmentService : IEquipmentService
         {
             throw new EquipmentWithIdNotExistsException();
         }
-        if (!_context.ErrorType.Any(e => e.Id == equipment.ErrorTypeId))
+        if (equipment.ErrorTypeId>0 && !_context.ErrorType.Any(e => e.Id == equipment.ErrorTypeId))
         {
             throw new ErrorTypeWithIdNotExistsException();
         }
-        var eq = _mapper.Map<Equipment>(equipment);
+        EquipmentUpdateDto updateDto = new EquipmentUpdateDto() { Name = equipment.Name };
+        if (equipment.ErrorTypeId > 0)
+        {
+            updateDto.ErrorTypeId = equipment.ErrorTypeId;
+        }
+        var eq = _mapper.Map<Equipment>(updateDto);
         eq.Id = id;
         _context.Equipment.Update(eq);
         await _context.SaveChangesAsync();
