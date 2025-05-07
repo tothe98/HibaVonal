@@ -53,6 +53,36 @@ public class OrderController : ControllerBase
 
     [HttpPut("{id}")]
     [Authorize("MaintenanceManager")]
+    public async Task<ActionResult<APIResponse>> UpdateStatus(int id, OrderStatusUpdateDto order)
+    {
+        APIResponse response = new APIResponse();
+        try
+        {
+            var result = await _orderService.UpdateStatus(id, order);
+            response.Data = result;
+            response.StatusCode = 200;
+            response.Message = "Order updated successfully";
+            return Ok(response);
+        }catch(OrderStatusNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (OrderWithIdNotExistsException ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.Message;
+        }
+        catch (Exception ex)
+        {
+            response.StatusCode = 202;
+            response.Message = ex.InnerException?.Message;
+        }
+        return BadRequest(response);
+    }
+
+    [HttpPut("{id}")]
+    [Authorize("MaintenanceManager")]
     public async Task<ActionResult<APIResponse>> Update(int id , OrderCreateDto order)
     {
         APIResponse response = new APIResponse();

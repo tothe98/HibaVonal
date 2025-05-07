@@ -12,6 +12,7 @@ public interface IOrderService
     Task<List<OrderDto>> List();
     Task<OrderDto> Create(OrderCreateDto order);
     Task<OrderDto> Update(int id, OrderCreateDto order);
+    Task<OrderDto> UpdateStatus(int id, OrderStatusUpdateDto updateDto);
     Task Delete(int id);
 }
 
@@ -65,6 +66,23 @@ public class OrderService : IOrderService
                 throw;
             }
         }
+    }
+
+    public async Task<OrderDto> UpdateStatus(int id, OrderStatusUpdateDto updateDto)
+    {
+        Order order = _context.Order.AsNoTracking().FirstOrDefault(o => o.Id == id);
+        if (order == null)
+        {
+            throw new OrderWithIdNotExistsException();
+        }
+        if ((int)updateDto.Status < 0 || (int)updateDto.Status > 3)
+        {
+            throw new OrderStatusNotExistsException();
+        }
+        order.Status = updateDto.Status;
+        _context.Order.Update(order);
+        await _context.SaveChangesAsync();
+        return _mapper.Map<OrderDto>(order);
     }
 
     public async Task<OrderDto> Update(int id, OrderCreateDto orderUpdateDto)

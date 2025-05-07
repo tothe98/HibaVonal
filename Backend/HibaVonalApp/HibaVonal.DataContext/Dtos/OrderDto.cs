@@ -15,9 +15,14 @@ public class OrderDto
 
 public class OrderCreateDto
 {
-    public DateTime? Date { get; set; }
+    public DateTime? Date { get; set; } = DateTime.Now;
 
-    public EOrderStatus Status { get; set; }
+    public EOrderStatus? Status { get; set; } = EOrderStatus.Accepted;
     
     public List<OrderItemCreateDto> Items { get; set; }
+}
+
+public class OrderStatusUpdateDto
+{
+    public EOrderStatus Status { get; set; }
 }
