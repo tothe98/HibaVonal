@@ -25,10 +25,9 @@ interface CreateErrorTypeFormData {
 
 interface Props {
   user: User;
-  isAuthenticated: boolean;
 }
 
-export default function ErrorTypeCreateClientPage({ user }: Props) {
+export default function CreateErrorTypeClientPage({ user }: Props) {
   const router = useRouter();
   const [formData, setFormData] = useState<CreateErrorTypeFormData>({
     name: "",

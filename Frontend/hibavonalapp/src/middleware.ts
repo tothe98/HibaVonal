@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from "next/server"
 import { decrypt } from "./lib/session"
 
 const protectedRoutes = ["/dashboard"]
-const adminRoutes = ["/dashboard/register-user", "/dashboard/errortypes", "/dashboard/errortype-create", "/dashboard/equipments", "/dashboard/create-equipment"]
-const managerRoutes = ["/dashboard/reports"]
+const adminRoutes = ["/dashboard/register-user", "/dashboard/errortypes", "/dashboard/create-errortype", "/dashboard/equipments", "/dashboard/create-equipment"]
+const managerRoutes = ["/dashboard/reports", "/dashboard/orders", "/dashboard/create-order"]
 const workerRoutes = ["/dashboard/assigned-issues", "/dashboard/work-orders"]
 const userRoutes = ["/dashboard/report-issue", "/dashboard/issues", "/dashboard/update-issue"]
 const publicRoutes = ["/"]

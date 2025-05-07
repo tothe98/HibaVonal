@@ -27,7 +27,7 @@ interface Props {
   user: User;
 }
 
-export default function EquipmentCreateClientPage({ user }: Props) {
+export default function CreateEquipmentClientPage({ user }: Props) {
   const router = useRouter();
   const [formData, setFormData] = useState<CreateEquipmentFormData>({
     name: "",

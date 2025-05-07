@@ -134,7 +134,7 @@ export default function ErrorTypesClientPage({ user }: ErrorTypesClientProps) {
           Back
         </Button>
         <h1 className="text-2xl font-semibold">ErrorTypes</h1>
-        <Button type="button" onClick={() => router.push("/dashboard/errortype-create")} className="px-4 py-2">
+        <Button type="button" onClick={() => router.push("/dashboard/create-errortype")} className="px-4 py-2">
           Create ErrorType
         </Button>
       </div>
@@ -158,7 +158,7 @@ export default function ErrorTypesClientPage({ user }: ErrorTypesClientProps) {
                 <tr key={errortype.id} className="border-t hover:bg-gray-50">
                   <td className="p-2">{errortype.name}</td>
                   <td className="p-2 text-right">
-                    <Button onClick={() => openDeleteModal(errortype)} className="bg-red-600 py-[7px] px-[15px] hover:bg-red-900" id={errortype.id + ""} type={"button"}>
+                    <Button onClick={() => openDeleteModal(errortype)} className="bg-err-high py-[7px] px-[15px] hover:bg-err-high-h" id={errortype.id + ""} type={"button"}>
                       Delete
                     </Button>
                   </td>

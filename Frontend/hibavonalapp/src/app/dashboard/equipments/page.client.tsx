@@ -156,7 +156,7 @@ export default function EquipmentsClientPage({ user }: EquipmentsClientProps) {
           Back
         </Button>
         <h1 className="text-2xl font-semibold">Equipments</h1>
-        <Button type="button" onClick={() => router.push("/dashboard/equipment-create")} className="px-4 py-2">
+        <Button type="button" onClick={() => router.push("/dashboard/create")} className="px-4 py-2">
           Create Equipment
         </Button>
       </div>
@@ -188,7 +188,7 @@ export default function EquipmentsClientPage({ user }: EquipmentsClientProps) {
                     </span>
                   </td>
                   <td className="p-2 text-right">
-                    <Button onClick={() => openDeleteModal(equipment)} className="bg-red-600 py-[7px] px-[15px] hover:bg-red-900" id={equipment.id + ""} type={"button"}>
+                    <Button onClick={() => openDeleteModal(equipment)} className="bg-err-high py-[7px] px-[15px] hover:bg-err-high-h" id={equipment.id + ""} type={"button"}>
                       Delete
                     </Button>
                   </td>

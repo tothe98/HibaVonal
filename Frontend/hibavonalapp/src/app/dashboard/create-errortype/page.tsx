@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decrypt, fetchCurrentUser } from "@/lib/session";
-import ErrorTypeCreateClientPage from "./page.client";
+import CreateErrorTypeClientPage from "./page.client";
 
 export default async function ErrorTypeCreatePage() {
   const cookieStore = await cookies();
@@ -21,5 +21,5 @@ export default async function ErrorTypeCreatePage() {
     redirect("/");
   }
 
-  return <ErrorTypeCreateClientPage user={user} />;
+  return <CreateErrorTypeClientPage user={user} />;
 }

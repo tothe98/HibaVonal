@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decrypt, fetchCurrentUser } from "@/lib/session";
-import EquipmentCreateClientPage from "./page.client";
+import CreateEquipmentClientPage from "./page.client";
 
 export default async function EquipmentCreatePage() {
   const cookieStore = await cookies();
@@ -21,5 +21,5 @@ export default async function EquipmentCreatePage() {
     redirect("/");
   }
 
-  return <EquipmentCreateClientPage user={user} />;
+  return <CreateEquipmentClientPage user={user} />;
 }
