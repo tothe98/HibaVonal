@@ -15,6 +15,7 @@ namespace HibaVonal.Services.Services
     public interface IUserService
     {
         Task<List<UserDataDto>> List();
+        Task<List<UserDataDto>> GetMaintenanceWorkers();
         Task<UserDataDto> GetById(int id);
         Task<UserDataDto> GetByEmail(string email);
         Task<UserDataDto> Update(int userId, UserUpdateDto user);
@@ -35,6 +36,11 @@ namespace HibaVonal.Services.Services
         public async Task<List<UserDataDto>> List()
         {
             return await _context.User.Include(r=>r.Roles).ThenInclude(ro=>ro.Role).Select(u=>_mapper.Map<UserDataDto>(u)).ToListAsync();
+        }
+
+        public async Task<List<UserDataDto>> GetMaintenanceWorkers()
+        {
+            return await _context.User.Include(r => r.Roles).ThenInclude(ro => ro.Role).Where(u => u.Roles.Any(r => r.Role.Id == 3)).Select(u => _mapper.Map<UserDataDto>(u)).ToListAsync();
         }
 
         public async Task<UserDataDto> GetById(int id)

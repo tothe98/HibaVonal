@@ -28,6 +28,14 @@ namespace HibaVonal.Controllers
 
         }
 
+        [HttpGet]
+        [Authorize("MaintenanceManager")]
+        public async Task<List<UserDataDto>> GetMaintenanceWorkers()
+        {
+            return await _userService.GetMaintenanceWorkers();
+
+        }
+
         [HttpGet("{id}")]
         [Authorize("User")]
         public async Task<ActionResult<APIResponse>> GetById(int id)

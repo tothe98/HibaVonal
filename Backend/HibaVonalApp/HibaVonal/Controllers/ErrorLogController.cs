@@ -120,7 +120,7 @@ namespace HibaVonal.Controllers
             catch (Exception ex)
             {
                 response.StatusCode = 500;
-                response.Message = ex.InnerException?.Message;
+                response.Message = ex.Message;
             }
 
             return BadRequest(response);
