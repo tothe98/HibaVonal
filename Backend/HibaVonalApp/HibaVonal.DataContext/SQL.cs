@@ -22,6 +22,8 @@ public class SQL : DbContext
     public DbSet<Equipment> Equipment { get; set; }
     public DbSet<ErrorLog> ErrorLog { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
+
+    public DbSet<RoomEquipment> RoomEquipment { get; set; }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Room>()
@@ -30,5 +32,20 @@ public class SQL : DbContext
             .HasValue<SharedRoom>("SharedRoom");
 
         modelBuilder.Entity<UserRole>().HasKey("UserId", "RoleId");
+
+        modelBuilder.Entity<RoomEquipment>()
+        .HasKey(re => new { re.RoomId, re.EquipmentId });
+
+        modelBuilder.Entity<RoomEquipment>()
+            .HasOne(re => re.Room)
+            .WithMany(r => r.RoomEquipment)
+            .HasForeignKey(re => re.RoomId);
+
+        modelBuilder.Entity<RoomEquipment>()
+            .HasOne(re => re.Equipment)
+            .WithMany(e => e.RoomEquipments)
+            .HasForeignKey(re => re.EquipmentId);
+
+
     }
 }

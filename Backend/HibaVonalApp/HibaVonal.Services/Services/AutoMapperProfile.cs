@@ -19,6 +19,11 @@ public class AutoMapperProfile : Profile
         CreateMap<Equipment, EquipmentCreateDto>().ReverseMap();
         CreateMap<Equipment, EquipmentUpdateDto>().ReverseMap();
 
+        CreateMap<RoomEquipment, RoomEquipmentDto>().ReverseMap();
+        CreateMap<RoomEquipment, RoomEquipmentCreateDto>().ReverseMap();
+        CreateMap<RoomEquipment, RoomEquipmentUpdateDto>().ReverseMap();
+
+
         CreateMap<ErrorType, ErrorTypeDto>().ReverseMap();
         CreateMap<ErrorType, ErrorTypeCreateUpdateDto>().ReverseMap();
 
@@ -29,6 +34,7 @@ public class AutoMapperProfile : Profile
         CreateMap<OrderItem, OrderItemDto>().ReverseMap();
         CreateMap<OrderItemCreateDto, OrderItem>();
 
+        CreateMap<Room , RoomDto2>().ReverseMap();
         CreateMap<Room, RoomDto>()
             .Include<SharedRoom, SharedRoomDto>()
             .Include<PersonalRoom, PersonalRoomDto>();

@@ -1,3 +1,4 @@
+using HibaVonal.DataContext.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -20,5 +21,5 @@ public abstract class Room
     [ForeignKey("DormitoryId")]
     public Dormitory Dormitory { get; set; }
 
-    public IList<Equipment>? Equipments { get; set; } = new List<Equipment>();
+    public IList<RoomEquipment>? RoomEquipment { get; set; } = new List<RoomEquipment>();
 }
