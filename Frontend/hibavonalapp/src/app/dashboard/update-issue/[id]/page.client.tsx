@@ -13,14 +13,26 @@ interface Role {
 
 interface Room {
   id: number;
+  floor: number;
+  roomType: string;
+  number: number;
+  residents: any[];
+  equipments: any[];
+  dormitory: any | null;
+  dormitoryId: number;
 }
 
-interface Issue {
+type Issue = {
+  id: number;
+  reportTime: string;
   description: string;
-  level: string; // "Low", "Medium", "High", or "Critical"
+  comment: string | null;
+  status: string;
+  level: string;
   room: Room;
-}
-
+  maintenanceWorker: User | null;
+  reporter: User;
+};
 interface User {
   id: number;
   name: string;
@@ -74,10 +86,12 @@ export default function UpdateIssueClientPage({ user, updateId }: Props) {
         return;
       }
       //bullshit múködik...
+      const data: Issue = result.data;
+
       setFormData({
-        description: result.data.description || "",
-        level: levelMap[result.data.level] ?? 0,
-        roomId: result.data.room.id,
+        description: data.description || "",
+        level: levelMap[data.level] ?? 0,
+        roomId: data.room.id,
       });
     };
 

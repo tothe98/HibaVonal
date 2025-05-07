@@ -144,11 +144,29 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
     },
   ];
 
-  const managerButtons: ButtonConfig[] = [];
+  const managerButtons: ButtonConfig[] = [
+    {
+      id: "7",
+      label: "Reports",
+      onClick: () => router.push("/dashboard/reports"),
+      icon: (
+        <svg width="64px" height="64px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
+          <g id="SVGRepo_tracerCarrier" strokeLinecap="round" strokeLinejoin="round"></g>
+          <g id="SVGRepo_iconCarrier">
+            {" "}
+            <path d="M9 5H7C5.89543 5 5 5.89543 5 7V19C5 20.1046 5.89543 21 7 21H17C18.1046 21 19 20.1046 19 19V7C19 5.89543 18.1046 5 17 5H15" stroke="#000000" strokeWidth="1.56" strokeLinecap="round" strokeLinejoin="round"></path>{" "}
+            <path d="M12 12H15" stroke="#000000" strokeWidth="1.56" strokeLinecap="round" strokeLinejoin="round"></path> <path d="M12 16H15" stroke="#000000" strokeWidth="1.56" strokeLinecap="round" strokeLinejoin="round"></path>{" "}
+            <path d="M9 5C9 3.89543 9.89543 3 11 3H13C14.1046 3 15 3.89543 15 5V7H9V5Z" stroke="#000000" strokeWidth="1.56" strokeLinecap="round" strokeLinejoin="round"></path> <circle cx="9" cy="12" r="1" fill="#000000"></circle> <circle cx="9" cy="16" r="1" fill="#000000"></circle>{" "}
+          </g>
+        </svg>
+      ),
+    },
+  ];
 
   const adminButtons: ButtonConfig[] = [
     {
-      id: "7",
+      id: "8",
       label: "Register User",
       onClick: () => router.push("/dashboard/register-user"),
       icon: (
@@ -213,7 +231,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
       ),
     },*/
     {
-      id: "11",
+      id: "9",
       label: "ErrorType Create",
       onClick: () => router.push("/dashboard/errortype-create"),
       icon: (
@@ -232,7 +250,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
       ),
     },
     {
-      id: "12",
+      id: "10",
       label: "ErrorTypes",
       onClick: () => router.push("/dashboard/errortypes"),
       icon: (
@@ -246,7 +264,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
       ),
     },
     {
-      id: "13",
+      id: "11",
       label: "Manage Equipment",
       onClick: () => router.push("/dashboard/equipments"),
       icon: (
@@ -271,7 +289,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
       ),
     },
     {
-      id: "14",
+      id: "12",
       label: "Create Equipment",
       onClick: () => router.push("/dashboard/equipment-create"),
       icon: (
