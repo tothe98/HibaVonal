@@ -93,38 +93,71 @@ namespace HibaVonal.Services.Services
             await _context.SaveChangesAsync();
             return _mapper.Map<ErrorLogDto>(errorlog);
         }
+
         public async Task<ErrorLogDto> Update(int id, ErrorLogUpdateDto errorLogUpdateDto)
         {
-            var errorLog = await _context.ErrorLog.AsNoTracking().FirstOrDefaultAsync(e => e.Id == id);
+            var errorLog = await _context.ErrorLog
+                .Include(e => e.Reporter)
+                .Include(e => e.MaintenanceWorker)
+                .Include(e => e.Room)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
             if (errorLog == null)
             {
                 throw new ErrorLogWithIdNotExistsException("Error log not found");
             }
-            var reporter = _context.User.Find(errorLogUpdateDto.ReporterId);
-            if (reporter == null)
+
+            if (errorLogUpdateDto.ReporterId.HasValue)
             {
-                throw new ReporterWithIdNotExistsException("Reporter not found");
+                var reporter = await _context.User.FindAsync(errorLogUpdateDto.ReporterId.Value);
+                if (reporter == null)
+                {
+                    throw new ReporterWithIdNotExistsException("Reporter not found");
+                }
+                errorLog.Reporter = reporter;
             }
-            var maintenanceWorker = _context.User.Find(errorLogUpdateDto.MaintenanceWorkerId);
-            if (maintenanceWorker == null)
+
+            if (errorLogUpdateDto.MaintenanceWorkerId.HasValue)
             {
-                throw new MaintenanceWorkerWithIdNotExistsException("Maintenance worker not found");
+                var maintenanceWorker = await _context.User.FindAsync(errorLogUpdateDto.MaintenanceWorkerId.Value);
+                if (maintenanceWorker == null)
+                {
+                    throw new MaintenanceWorkerWithIdNotExistsException("Maintenance worker not found");
+                }
+                errorLog.MaintenanceWorker = maintenanceWorker;
             }
-            var room = _context.Room.Find(errorLogUpdateDto.RoomId);
-            if (room == null)
+
+            if (errorLogUpdateDto.RoomId.HasValue)
             {
-                throw new RoomWithIdNotExistsException();
+                var room = await _context.Room.FindAsync(errorLogUpdateDto.RoomId.Value);
+                if (room == null)
+                {
+                    throw new RoomWithIdNotExistsException();
+                }
+                errorLog.Room = room;
             }
-            _mapper.Map(errorLogUpdateDto, errorLog);
-            errorLog.Reporter = reporter;
-            errorLog.MaintenanceWorker = maintenanceWorker;
-            errorLog.Comment = errorLogUpdateDto.Comment;
-            errorLog.Room = room;
+
+            if (errorLogUpdateDto.Status.HasValue)
+            {
+                errorLog.Status = errorLogUpdateDto.Status.Value;
+            }
+
+            if (errorLogUpdateDto.Level.HasValue)
+            {
+                errorLog.Level = errorLogUpdateDto.Level.Value;
+            }
+
+            if (errorLogUpdateDto.Comment != null)
+            {
+                errorLog.Comment = errorLogUpdateDto.Comment;
+            }
 
             _context.ErrorLog.Update(errorLog);
             await _context.SaveChangesAsync();
+
             return _mapper.Map<ErrorLogDto>(errorLog);
         }
+
 
         public async Task Delete(int id)
         {

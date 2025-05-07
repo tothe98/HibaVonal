@@ -32,13 +32,12 @@ namespace HibaVonal.DataContext.Dtos
 
     public class ErrorLogUpdateDto
     {
-        public DateTime ReportTime { get; set; }
-        public string Description { get; set; }
-        public string Comment { get; set; }
-        public EErrorStatus Status { get; set; }
-        public EErrorLevel Level { get; set; }
-        public int RoomId { get; set; }
+        public string? Description { get; set; }
+        public string? Comment { get; set; }
+        public EErrorStatus? Status { get; set; }
+        public EErrorLevel? Level { get; set; }
+        public int? RoomId { get; set; }
         public int? MaintenanceWorkerId { get; set; }
-        public int ReporterId { get; set; }
+        public int? ReporterId { get; set; }
     }
 }
