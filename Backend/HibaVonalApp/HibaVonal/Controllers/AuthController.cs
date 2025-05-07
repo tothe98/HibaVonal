@@ -1,4 +1,5 @@
-﻿using HibaVonal.DataContext.Dtos;
+﻿using Azure;
+using HibaVonal.DataContext.Dtos;
 using HibaVonal.Services.Exceptions;
 using HibaVonal.Services.Services;
 using LibraryCommon.Models;
@@ -75,6 +76,11 @@ namespace HibaVonal.Controllers
                 response.Message = "Registration successful";
                 response.Data = user;
                 return Ok(response);
+            }catch(RoomWithIdNotExistsException ex)
+            {
+                response.StatusCode = 400;
+                response.Message = ex.Message;
+                return BadRequest(response);
             }
             catch (MandatoryPropertyEmptyException ex)
             {
@@ -100,6 +106,13 @@ namespace HibaVonal.Controllers
                 response.Message = ex.Message;
                 return StatusCode(500, response);
             }
+        }
+
+        [HttpGet]
+        [Authorize("Admin")]
+        public async Task<ActionResult<List<RoleDto>>> ListRoles()
+        {
+            return await _authService.ListRoles();
         }
 
         [HttpGet]
