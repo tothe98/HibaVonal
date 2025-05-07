@@ -6,7 +6,7 @@ const protectedRoutes = ["/dashboard"]
 const adminRoutes = ["/dashboard/register-user", "/dashboard/errortypes", "/dashboard/errortype-create", "/dashboard/equipments", "/dashboard/create-equipment"]
 const managerRoutes = ["/dashboard/reports"]
 const workerRoutes = ["/dashboard/assigned-issues", "/dashboard/work-orders"]
-const userRoutes = ["/dashboard/report-issue", "/dashboard/issues"]
+const userRoutes = ["/dashboard/report-issue", "/dashboard/issues", "/dashboard/update-issue"]
 const publicRoutes = ["/"]
 
 export default async function middleware(req: NextRequest) {

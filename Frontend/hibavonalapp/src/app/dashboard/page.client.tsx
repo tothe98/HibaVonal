@@ -164,7 +164,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
         </svg>
       ),
     },
-    {
+    /*{
       id: "8",
       label: "Manage Issues",
       onClick: () => router.push("/manage-issues"),
@@ -211,7 +211,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
           </g>
         </svg>
       ),
-    },
+    },*/
     {
       id: "11",
       label: "ErrorType Create",
