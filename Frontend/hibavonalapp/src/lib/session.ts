@@ -62,7 +62,7 @@ interface Role {
 }
 
 interface User {
-    id: string
+    id: number
     name: string
     email: string
     phoneNumber: string
