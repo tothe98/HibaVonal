@@ -127,7 +127,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
         {
             id: "6",
             label: "Make Order",
-            onClick: logout,
+            onClick: () => router.push("/dashboard/make-order"),
             icon: (
                 <svg width="64px" height="64px" viewBox="0 0 20.00 20.00" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                     <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
@@ -164,7 +164,7 @@ export default function DashboardClientPage({ user }: DashboardClientPageProps) 
         {
             id: "9",
             label: "Make Order",
-            onClick: logout,
+            onClick: () => router.push("/dashboard/make-order"),
             icon: (
                 <svg width="64px" height="64px" viewBox="0 0 20.00 20.00" version="1.1" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                     <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
