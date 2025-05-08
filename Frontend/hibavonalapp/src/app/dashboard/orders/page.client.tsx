@@ -204,7 +204,7 @@ export default function OrdersClientPage({ user }: Props) {
                                         </td>
                                         <td className="p-2 relative group">
                                             <span
-                                                className="text-blue-600 cursor-pointer underline"
+                                                className="text-cyan-400 hover:text-cyan-500 cursor-pointer underline"
                                                 onMouseEnter={handleMouseEnter}
                                                 ref={(el) => {
                                                     if (el) triggerRefs.current.set(order.id, el)
@@ -217,7 +217,7 @@ export default function OrdersClientPage({ user }: Props) {
                                                 className="fixed hidden group-hover:block bg-white border border-gray-300 rounded-lg shadow-lg p-4 z-50 min-w-[350px] max-h-[300px] overflow-y-auto"
                                             >
                                                 <h4 className="font-semibold text-lg mb-3">Order Items</h4>
-                                                {order.items.length === 0 ? (
+                                                {order.items.length < 1 ? (
                                                     <p className="text-gray-500">No items in this order.</p>
                                                 ) : (
                                                     <div className="space-y-3">

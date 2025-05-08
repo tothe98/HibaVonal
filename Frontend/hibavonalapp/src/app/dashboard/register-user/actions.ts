@@ -1,7 +1,6 @@
 "use server"
 
 import { cookies } from 'next/headers'
-import { z } from "zod"
 
 interface RegisterFormData {
     name: string;
@@ -24,19 +23,7 @@ interface RegisterFormDataWithRoom {
 
 interface Roles {
     id: number
-    roleName: string
-}
-
-interface APIResponse<T> {
-    statusCode: number
-    message: string | null
-    data: T | null
-}
-
-function isValidEmail(email: string): boolean {
-    const emailRegex =
-        /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email);
+    name: string
 }
 
 export async function registerUserWithRoom(formData: RegisterFormDataWithRoom) {
@@ -45,10 +32,6 @@ export async function registerUserWithRoom(formData: RegisterFormDataWithRoom) {
 
     if (!token) {
         return { success: false, error: 'No session token found.' }
-    }
-
-    if (!isValidEmail(formData.email)) {
-        return { success: false, error: 'Invalid email format.' }
     }
 
     try {
@@ -61,11 +44,9 @@ export async function registerUserWithRoom(formData: RegisterFormDataWithRoom) {
             body: JSON.stringify(formData),
         })
 
-        //const json: APIResponse<null> = await response.json()
         const json = await response.json();
-        console.log('Register error response:', json);
+
         if (!response.ok || json.statusCode !== 200) {
-            console.log(response);
             return { success: false, error: json.message || 'Failed to register user.' }
         }
 
@@ -95,9 +76,7 @@ export async function registerUser(formData: RegisterFormData) {
 
         const json = await response.json();
 
-        console.log('Register error response:', json);
         if (!response.ok || json.statusCode !== 200) {
-            console.log(response);
             return { success: false, error: json.message || 'Failed to register user.' }
         }
 

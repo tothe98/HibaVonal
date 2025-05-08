@@ -1,10 +1,10 @@
 "use client"
 
-import { useActionState } from "react"
-import { login } from "./actions"
+import { useActionState } from 'react'
+import { login } from './actions'
 
-import InputField from "@/components/InputField"
-import LoginButton from "@/components/LoginButton"
+import InputField from '@/components/InputField'
+import LoginButton from '@/components/LoginButton'
 
 export default function LoginClientPage() {
     const [state, loginAction] = useActionState(login, undefined)
@@ -13,9 +13,9 @@ export default function LoginClientPage() {
         <form
             action={loginAction}
             className={`
-                    w-full sm:max-w-sm max-w-xs px-8 pt-10 pb-12 mb-4
-                    bg-white rounded-xl shadow-2xl shadow-gray-600
-                `}
+                w-full sm:max-w-sm max-w-xs px-8 pt-10 pb-12 mb-4
+                bg-white rounded-xl shadow-2xl shadow-gray-600
+            `}
         >
             <h1 className="select-none sm:text-[2.5rem] text-4xl text-center font-bold mb-12 pb-2">
                 Dorm Manager
@@ -41,9 +41,17 @@ export default function LoginClientPage() {
 
             <div className="mx-8 flex sm:flex-row flex-col-reverse items-center justify-between">
                 <LoginButton />
-                <a className="select-none sm:mb-0 mb-4 inline-block align-baseline font-bold text-sm text-gray-500 hover:text-cyan-500 duration-200" href="#">
-                    Forgot Password?
-                </a>
+                <span className="relative group">
+                    <a
+                        className="select-none sm:mb-0 mb-4 inline-block align-baseline font-bold text-sm text-gray-500 hover:text-cyan-500 duration-200"
+                        href="#"
+                    >
+                        Forgot Password?
+                    </a>
+                    <div className="absolute left-0 top-full mt-2 hidden group-hover:block bg-white border border-gray-300 rounded-lg shadow-lg p-2 z-10 min-w-[100px] text-center">
+                        <p className="text-gray-700 text-sm">Too bad</p>
+                    </div>
+                </span>
             </div>
         </form>
     )

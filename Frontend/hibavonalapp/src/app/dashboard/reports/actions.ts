@@ -11,6 +11,7 @@ interface Issue {
     level: string
     maintenanceWorker: MaintenanceWorker | null
 }
+
 interface MaintenanceWorker {
     id: number,
     email: string,
@@ -38,8 +39,6 @@ export async function fetchReports(): Promise<{ success: boolean; error: string 
         if (!response.ok) {
             return { success: false, error: 'Failed to fetch issues.', data: [] }
         }
-
-        //console.log(await response.json())
 
         const data: Issue[] = await response.json()
         return { success: true, error: null, data }
@@ -101,8 +100,7 @@ export async function updateIssue(
             body: JSON.stringify({ status, maintenanceWorkerId: workerId }),
         })
 
-        const data = await response.json(); // 👈 Call once
-        console.log(data);
+        const data = await response.json();
 
         if (!response.ok) {
             const errorData = data
