@@ -11,9 +11,10 @@ interface InputFieldProps {
     max?: number;
     disabled?: boolean;
     value?: string;
+    className?: string;
 }
 
-export default function InputField({ name, placeholder, label, type, onChange, required, min, max, disabled, value }: InputFieldProps) {
+export default function InputField({ name, placeholder, label, type, onChange, required, min, max, disabled, value, className }: InputFieldProps) {
     const inputId = name ? `input-field-${name}` : undefined;
 
     return (
@@ -27,7 +28,7 @@ export default function InputField({ name, placeholder, label, type, onChange, r
                 className={`
                     w-full min-w-64 py-4 px-3 rounded-md border-2 leading-tight
                     border-gray-500 hover:border-cyan-500 focus:border-cyan-500 text-base text-gray-900 placeholder:text-gray-500
-                    focus:outline-none appearance-none
+                    focus:outline-none appearance-none ${className}
                 `}
                 type={type}
                 name={name}

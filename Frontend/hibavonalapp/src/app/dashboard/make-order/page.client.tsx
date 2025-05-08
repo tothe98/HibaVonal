@@ -90,22 +90,28 @@ export default function MakeOrderClientPage({ user }: Props) {
     }
 
     return (
-        <main className="w-full sm:my-4 max-w-4xl p-4 sm:p-6 mx-auto bg-white rounded-none sm:rounded-xl shadow-2xl shadow-gray-600 flex flex-col items-center">
-            <h1 className="text-2xl font-semibold">Make Order</h1>
+        <main
+            className={`
+                w-full sm:my-4 max-w-4xl p-4 sm:p-6 mx-auto
+                bg-white rounded-none sm:rounded-xl shadow-2xl shadow-gray-600
+                flex flex-col items-center
+            `}
+        >
+            <h1 className="text-2xl font-semibold mb-4">Make Order</h1>
 
             <div className="h-8">
                 {error && <p className="text-red-500 mb-4">{error}</p>}
             </div>
 
             {orderItems.map((item, i) => (
-                <div key={i} className="flex flex-row gap-4 mb-2">
+                <div key={i} className="flex flex-col gap-2 sm:flex-row sm:gap-4 mb-4 w-full">
                     <select
-                        id={i + "-s"}
+                        id={`${i}-s`}
                         value={item.equipmentId}
                         onChange={(e) =>
                             handleItemChange(i, 'equipmentId', parseInt(e.target.value))
                         }
-                        className="border rounded px-2 py-1"
+                        className="w-full sm:flex-1 border rounded px-2 py-1"
                     >
                         {equipments.map((equipment) => (
                             <option key={equipment.id} value={equipment.id}>
@@ -125,6 +131,7 @@ export default function MakeOrderClientPage({ user }: Props) {
                             handleItemChange(i, 'quantity', parseInt(e.target.value))
                         }
                         required
+                        className="w-full sm:flex-1"
                     />
 
                     <InputField
@@ -137,15 +144,21 @@ export default function MakeOrderClientPage({ user }: Props) {
                             handleItemChange(i, 'price', parseInt(e.target.value))
                         }
                         required
+                        className="w-full sm:flex-1"
                     />
 
-                    <Button id={i + "-b"} type="button" onClick={() => removeOrderItem(i)}>
+                    <Button
+                        id={`${i}-b`}
+                        type="button"
+                        onClick={() => removeOrderItem(i)}
+                        className="bg-err-high hover:bg-err-high-h w-full sm:w-auto px-4 py-2"
+                    >
                         -
                     </Button>
                 </div>
             ))}
 
-            <Button type="button" onClick={addOrderItem} className="mb-4">
+            <Button type="button" onClick={addOrderItem} className="mb-4 w-full sm:w-auto">
                 +
             </Button>
             <div className="flex justify-between items-center w-full">
