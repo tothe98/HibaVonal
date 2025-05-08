@@ -1,11 +1,17 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decrypt, fetchCurrentUser } from "@/lib/session";
-import DashboardClientPage from "./page.client";
+import UpdateIssueClientPage from "./page.client";
 
-export default async function DashboardPage() {
+interface Params {
+  id: string;
+}
+
+export default async function UpdateIssuePage({ params }: { params: Promise<Params> }) {
+  const { id } = await params;
+
   const cookieStore = await cookies();
-  const token = cookieStore.get("session")?.value;
+  const token = (await cookieStore.get("session"))?.value;
 
   if (!token) {
     redirect("/");
@@ -17,9 +23,9 @@ export default async function DashboardPage() {
   }
 
   const user = await fetchCurrentUser(token);
-  if (!user || !user.roles || !user.roles.length) {
+  if (!user || !user.roles) {
     redirect("/");
   }
 
-  return <DashboardClientPage user={user} />;
+  return <UpdateIssueClientPage user={user} updateId={parseInt(id)} />;
 }

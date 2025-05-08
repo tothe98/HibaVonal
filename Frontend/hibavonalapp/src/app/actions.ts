@@ -30,11 +30,10 @@ export async function login(prevState: any, formData: FormData) {
     })
 
     if (!response.ok) {
-        return {
-            errors: {
-                email: ["Invalid email or password"]
-            }
+        if (response.status === 401) {
+            return { errors: { email: ["Invalid email or password"] } }
         }
+        return { errors: { email: ["Server error, please try again later"] } }
     }
 
     const data = await response.json()

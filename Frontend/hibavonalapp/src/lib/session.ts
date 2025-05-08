@@ -14,6 +14,7 @@ export async function createSession(token: string, expiresAt: Date) {
         value: token,
         httpOnly: true,
         secure: true,
+        sameSite: 'strict',
         expires: expiresDate,
     })
 }
@@ -28,7 +29,7 @@ export async function decrypt(session: string | undefined = '') {
         const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/Auth/ValidateToken`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${session}`
+                Authorization: `Bearer ${session}`
             }
         })
 
@@ -36,8 +37,6 @@ export async function decrypt(session: string | undefined = '') {
             const { payload } = await jwtVerify(session, encodedKey, {
                 algorithms: ['HS256'],
             })
-            // delete log in production along with status 401
-            console.log("Authorized")
             return payload
         }
 
@@ -46,8 +45,52 @@ export async function decrypt(session: string | undefined = '') {
         }
 
     } catch (error) {
-        console.log("Failed to verify session")
+        console.log("Failed to verify session: ", error)
+        return null
     }
 }
 
+interface APIResponse<T> {
+    statusCode: number
+    message: string | null
+    data: T | null
+}
 
+interface Role {
+    roleId: number;
+    name: string;
+}
+
+interface User {
+    id: number
+    name: string
+    email: string
+    phoneNumber: string
+    personalRoomId: number
+    roles: Role[]
+}
+
+export async function fetchCurrentUser(token: string): Promise<User | null> {
+    try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/User/GetCurrent`, {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+            cache: 'no-store',
+        })
+
+        if (!response.ok) {
+            throw new Error(`Failed to fetch user: ${response.status}`)
+        }
+
+        const json: APIResponse<User> = await response.json()
+        if (json.statusCode !== 200 || !json.data) {
+            throw new Error(`API error: ${json.message || 'Unknown error'}`)
+        }
+
+        return json.data
+
+    } catch (error) {
+        console.error('Error fetching user data: ', error)
+        return null
+    }
+}

@@ -1,9 +1,9 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { decrypt, fetchCurrentUser } from "@/lib/session";
-import DashboardClientPage from "./page.client";
+import MakeOrderClientPage from "./page.client";
 
-export default async function DashboardPage() {
+export default async function MakeOrderPage() {
   const cookieStore = await cookies();
   const token = cookieStore.get("session")?.value;
 
@@ -17,9 +17,9 @@ export default async function DashboardPage() {
   }
 
   const user = await fetchCurrentUser(token);
-  if (!user || !user.roles || !user.roles.length) {
+  if (!user || !user.roles) {
     redirect("/");
   }
 
-  return <DashboardClientPage user={user} />;
+  return <MakeOrderClientPage user={user} />;
 }
