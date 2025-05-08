@@ -17,18 +17,35 @@ interface OrderItem {
     price: number
 }
 
-export default function MakeOrderClientPage() {
+interface Role {
+    roleId: number;
+    name: string;
+}
+
+interface User {
+    name: string;
+    email: string;
+    roles: Role[];
+}
+
+interface Props {
+    user: User
+}
+
+export default function MakeOrderClientPage({ user }: Props) {
     const router = useRouter()
     const [equipments, setEquipments] = useState<Equipment[]>([])
     const [orderItems, setOrderItems] = useState<OrderItem[]>([])
     const [error, setError] = useState<string | null>(null)
+
+    const roles = user.roles || [];
 
     useEffect(() => {
         const loadEquipments = async () => {
             const result = await fetchEquipmemt()
             if (!result.success) {
                 console.error(result.error)
-                return
+                return null
             }
             setEquipments(result.data)
         }
@@ -64,33 +81,29 @@ export default function MakeOrderClientPage() {
             setError(result.error)
             return null
         }
-        router.push('/dashboard')
 
+        if (roles.some((role) => role.roleId === 2)) {
+            router.push('/dashboard/orders')
+        } else {
+            router.push('/dashboard')
+        }
     }
 
     return (
         <main className="w-full sm:my-4 max-w-4xl p-4 sm:p-6 mx-auto bg-white rounded-none sm:rounded-xl shadow-2xl shadow-gray-600 flex flex-col items-center">
-            <div className="flex justify-between items-center w-full mb-4">
-                <Button
-                    type="button"
-                    onClick={() => router.push('/dashboard')}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400"
-                >
-                    Back
-                </Button>
-                <h1 className="text-2xl font-semibold">Make Order</h1>
-                <div></div>
-            </div>
+            <h1 className="text-2xl font-semibold">Make Order</h1>
+
             <div className="h-8">
                 {error && <p className="text-red-500 mb-4">{error}</p>}
             </div>
 
-            {orderItems.map((item, index) => (
-                <div key={index} className="flex flex-row gap-4 mb-2">
+            {orderItems.map((item, i) => (
+                <div key={i} className="flex flex-row gap-4 mb-2">
                     <select
+                        id={i + "-s"}
                         value={item.equipmentId}
                         onChange={(e) =>
-                            handleItemChange(index, 'equipmentId', parseInt(e.target.value))
+                            handleItemChange(i, 'equipmentId', parseInt(e.target.value))
                         }
                         className="border rounded px-2 py-1"
                     >
@@ -109,7 +122,7 @@ export default function MakeOrderClientPage() {
                         max={100}
                         value={item.quantity + ""}
                         onChange={(e) =>
-                            handleItemChange(index, 'quantity', parseInt(e.target.value))
+                            handleItemChange(i, 'quantity', parseInt(e.target.value))
                         }
                         required
                     />
@@ -121,24 +134,32 @@ export default function MakeOrderClientPage() {
                         min={1}
                         value={item.price + ""}
                         onChange={(e) =>
-                            handleItemChange(index, 'price', parseInt(e.target.value))
+                            handleItemChange(i, 'price', parseInt(e.target.value))
                         }
                         required
                     />
 
-                    <Button type="button" onClick={() => removeOrderItem(index)}>
+                    <Button id={i + "-b"} type="button" onClick={() => removeOrderItem(i)}>
                         -
                     </Button>
                 </div>
             ))}
 
             <Button type="button" onClick={addOrderItem} className="mb-4">
-                + Add item
+                +
             </Button>
-
-            <Button type="button" onClick={handleSubmit}>
-                Make an order
-            </Button>
+            <div className="flex justify-between items-center w-full">
+                <Button
+                    type="button"
+                    onClick={() => router.push('/dashboard')}
+                    className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400"
+                >
+                    Cancel
+                </Button>
+                <Button type="button" onClick={handleSubmit}>
+                    Submit
+                </Button>
+            </div>
         </main>
     )
 }

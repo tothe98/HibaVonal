@@ -173,7 +173,7 @@ export default function ReportIssueClientPage({ user }: Props) {
                         min={1}
                     />
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-between gap-2">
                     <Button
                         type="button"
                         onClick={() => router.push('/dashboard')}

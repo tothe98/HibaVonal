@@ -68,8 +68,6 @@ export default function CreateEquipmentClientPage({ user }: Props) {
     router.push("/dashboard/equipments");
   };
 
-  const levelStyles = ["bg-err-low hover:bg-err-low-h", "bg-err-medium hover:bg-err-medium-h", "bg-err-high hover:bg-err-high-h", "bg-err-critical hover:bg-err-critical-h"];
-
   return (
     <main
       className={`
@@ -78,13 +76,13 @@ export default function CreateEquipmentClientPage({ user }: Props) {
                 flex flex-col items-center
             `}
     >
-      <h1 className="text-2xl font-semibold mb-4">Create Equipment</h1>
+      <h1 className="text-2xl font-semibold mb-4">Add Equipment</h1>
       <div className="h-8">{error && <p className="text-red-500 mb-4">{error}</p>}</div>
       <form onSubmit={handleSubmit} className="w-full">
         <div className="mb-8">
-          <InputField name="name" label="Name" type="string" placeholder="Enter equipment Name" onChange={handleChange} />
+          <InputField name="name" label="Name" type="string" placeholder="Enter name of the equipment" onChange={handleChange} />
         </div>
-        <div className="flex justify-end gap-2">
+        <div className="flex justify-between gap-2">
           <Button type="button" onClick={() => router.push("/dashboard")} className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400" disabled={isSubmitting}>
             Cancel
           </Button>

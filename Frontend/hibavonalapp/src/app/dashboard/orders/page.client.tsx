@@ -144,16 +144,15 @@ export default function OrdersClientPage({ user }: Props) {
         flex flex-col items-center
       `}
         >
+            <h1 className="text-2xl font-semibold sm:mb-0 mb-4">Orders</h1>
+
             <div className="flex justify-between items-center w-full mb-4">
-                <Button
-                    type="button"
-                    onClick={() => router.push('/dashboard')}
-                    className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400"
-                >
+                <Button type="button" onClick={() => router.push("/dashboard")} className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400">
                     Back
                 </Button>
-                <h1 className="text-2xl font-semibold">Orders</h1>
-                <div></div>
+                <Button type="button" onClick={() => router.push("/dashboard/make-order")} className="px-4 py-2">
+                    Make Order
+                </Button>
             </div>
 
             <div className="h-8">{error && <p className="text-red-500 mb-4">{error}</p>}</div>

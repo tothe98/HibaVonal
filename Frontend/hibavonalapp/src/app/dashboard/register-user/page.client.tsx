@@ -162,21 +162,22 @@ export default function RegisterUserClientPage({ user }: Props) {
             <div className="h-8">{error && <p className="text-red-500 mb-4">{error}</p>}</div>
             <form onSubmit={handleSubmit} className="w-full">
                 <div className="mb-8">
-                    <InputField name="name" label="Name" type="string" placeholder="Name" onChange={handleChange} />
+                    <InputField name="name" label="Name" type="string" placeholder="Enter name" onChange={handleChange} />
                 </div>
                 <div className="mb-8">
-                    <InputField name="email" label="Email" type="Email" placeholder="Email" onChange={handleChange} />
+                    <InputField name="email" label="Email" type="Email" placeholder="Enter email" onChange={handleChange} />
                 </div>
                 <div className="mb-8">
-                    <InputField name="phoneNumber" label="PhoneNumber" type="string" placeholder="PhoneNumber" onChange={handleChange} />
+                    <InputField name="phoneNumber" label="Phone Number" type="string" placeholder="Enter phone number" onChange={handleChange} />
                 </div>
                 <div className="mb-8">
-                    <InputField name="password" label="Password" type="Password" placeholder="Password" onChange={handleChange} />
+                    <InputField name="password" label="Password" type="Password" placeholder="Enter password" onChange={handleChange} />
                 </div>
                 <div className="mb-8">
-                    <InputField name="passwordConfirm" label="Confirm Password" type="Password" placeholder="Confirm Password" onChange={handleChange} />
+                    <InputField name="passwordConfirm" label="Confirm Password" type="Password" placeholder="Enter password again" onChange={handleChange} />
                 </div>
                 <div className="mb-8">
+                <label htmlFor="roleId" className="block ml-1 mb-2 text-md text-gray-700">Role</label>
                     <select
                         id="roleId"
                         name="roleId"
@@ -195,9 +196,9 @@ export default function RegisterUserClientPage({ user }: Props) {
                     </select>
                 </div>
                 <div className="mb-8">
-                    <InputField name="roomId" label="RoomId" type="number" placeholder="RoomId" onChange={handleChange} />
+                    <InputField name="roomId" label="Room Id" type="number" placeholder="Enter room id" onChange={handleChange} />
                 </div>
-                <div className="flex justify-end gap-2">
+                <div className="flex justify-between gap-2">
                     <Button
                         type="button"
                         onClick={() => router.push('/dashboard')}
@@ -207,7 +208,7 @@ export default function RegisterUserClientPage({ user }: Props) {
                         Cancel
                     </Button>
                     <Button type="submit" className="px-6 py-2" disabled={isSubmitting}>
-                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                        {isSubmitting ? 'Submitting...' : 'Register'}
                     </Button>
                 </div>
             </form>

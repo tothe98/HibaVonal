@@ -153,6 +153,7 @@ export default function AssignedIssuesClientPage({ user }: Props) {
                 flex flex-col items-center
             `}
         >
+            <h1 className="text-2xl font-semibold sm:mb-0 mb-4">Assigned Issues</h1>
             <div className="flex justify-between items-center w-full mb-4">
                 <Button
                     type="button"
@@ -161,7 +162,6 @@ export default function AssignedIssuesClientPage({ user }: Props) {
                 >
                     Back
                 </Button>
-                <h1 className="text-2xl font-semibold">Assigned Issues</h1>
                 <div></div>
             </div>
 
