@@ -7,93 +7,91 @@ import Button from "@/components/Button";
 import { createErrorType } from "./actions";
 
 interface Role {
-  roleId: number;
-  name: string;
+    roleId: number;
+    name: string;
 }
 
 interface User {
-  id: number;
-  name: string;
-  email: string;
-  phoneNumber: string;
-  roles: Role[];
+    id: number;
+    name: string;
+    email: string;
+    phoneNumber: string;
+    roles: Role[];
 }
 
 interface CreateErrorTypeFormData {
-  name: string;
+    name: string;
 }
 
 interface Props {
-  user: User;
+    user: User;
 }
 
 export default function CreateErrorTypeClientPage({ user }: Props) {
-  const router = useRouter();
-  const [formData, setFormData] = useState<CreateErrorTypeFormData>({
-    name: "",
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setIsSubmitting(true);
-
-    if (!formData.name) {
-      setError("ErrorName is required.");
-      setIsSubmitting(false);
-      return null;
-    }
-
-    const result = await createErrorType({
-      name: formData.name,
+    const router = useRouter();
+    const [formData, setFormData] = useState<CreateErrorTypeFormData>({
+        name: "",
     });
+    const [error, setError] = useState<string | null>(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    setIsSubmitting(false);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        const { name, value } = e.target;
+        setFormData((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
-    if (!result.success) {
-      setError(result.error);
-      return null;
-    }
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setIsSubmitting(true);
 
-    router.push("/dashboard/errortypes");
-  };
+        if (!formData.name) {
+            setError("ErrorName is required.");
+            setIsSubmitting(false);
+            return null;
+        }
 
-  const levelStyles = ["bg-err-low hover:bg-err-low-h", "bg-err-medium hover:bg-err-medium-h", "bg-err-high hover:bg-err-high-h", "bg-err-critical hover:bg-err-critical-h"];
+        const result = await createErrorType({
+            name: formData.name,
+        });
 
-  return (
-    <main
-      className={`
+        setIsSubmitting(false);
+
+        if (!result.success) {
+            setError(result.error);
+            return null;
+        }
+
+        router.push("/dashboard/errortypes");
+    };
+
+    return (
+        <main
+            className={`
                 w-full my-4 sm:max-w-md max-w-xs p-4 sm:p-6
                 bg-white rounded-xl shadow-2xl shadow-gray-600
                 flex flex-col items-center
             `}
-    >
-      <h1 className="text-2xl font-semibold mb-4">Create Errortype</h1>
-      <div className="h-8">{error && <p className="text-red-500 mb-4">{error}</p>}</div>
-      <form onSubmit={handleSubmit} className="w-full">
-        <div className="mb-4">
-          <InputField name="name" label="Name" type="string" placeholder="Enter errortype name" onChange={handleChange} min={1} />
-        </div>
+        >
+            <h1 className="text-2xl font-semibold mb-4">Add Error Type</h1>
+            <div className="h-8">{error && <p className="text-red-500 mb-4">{error}</p>}</div>
+            <form onSubmit={handleSubmit} className="w-full">
+                <div className="mb-8">
+                    <InputField name="name" label="Name" type="string" placeholder="Enter name of the error type" onChange={handleChange} min={1} />
+                </div>
 
-        <div className="flex justify-end gap-2">
-          <Button type="button" onClick={() => router.push("/dashboard")} className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400" disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button type="submit" className="px-6 py-2" disabled={isSubmitting}>
-            {isSubmitting ? "Submitting..." : "Submit"}
-          </Button>
-        </div>
-      </form>
-    </main>
-  );
+                <div className="flex justify-between gap-2">
+                    <Button type="button" onClick={() => router.push("/dashboard")} className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400" disabled={isSubmitting}>
+                        Cancel
+                    </Button>
+                    <Button type="submit" className="px-6 py-2" disabled={isSubmitting}>
+                        {isSubmitting ? "Submitting..." : "Submit"}
+                    </Button>
+                </div>
+            </form>
+        </main>
+    );
 }

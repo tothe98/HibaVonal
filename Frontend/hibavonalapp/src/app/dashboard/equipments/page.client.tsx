@@ -150,13 +150,13 @@ export default function EquipmentsClientPage({ user }: EquipmentsClientProps) {
                     </div>
                 </div>
             )}
+            <h1 className="text-2xl font-semibold sm:mb-0 mb-4">Equipments</h1>
             <div className="flex justify-between items-center w-full mb-4">
                 <Button type="button" onClick={() => router.push("/dashboard")} className="px-4 py-2 bg-gray-300 text-gray-700 hover:bg-gray-400">
                     Back
                 </Button>
-                <h1 className="text-2xl font-semibold">Equipments</h1>
                 <Button type="button" onClick={() => router.push("/dashboard/create")} className="px-4 py-2">
-                    Create Equipment
+                    Add
                 </Button>
             </div>
 
